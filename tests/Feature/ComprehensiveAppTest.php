@@ -415,4 +415,51 @@ class ComprehensiveAppTest extends TestCase
         $this->assertNotNull($user);
         $this->assertEquals(1, Provider::where('user_id', $user->id)->count());
     }
+
+    public function test_customer_dashboard_has_logout_option_and_can_logout(): void
+    {
+        $customer = User::create([
+            'name' => 'Logout Test User',
+            'email' => 'logout.test@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'customer',
+            'city' => 'Ahmedabad',
+        ]);
+
+        $response = $this->actingAs($customer)->get(route('customer.dashboard'));
+        $response->assertStatus(200);
+
+        // Verify logout options are present in dashboard
+        $response->assertSee('Logout');
+        $response->assertSee(route('logout'));
+
+        // Verify logging out
+        $logoutResponse = $this->actingAs($customer)->post(route('logout'));
+        $logoutResponse->assertRedirect('/');
+        $this->assertGuest();
+    }
+
+    public function test_dashboard_hamburger_menu_button_has_correct_attributes_and_markup(): void
+    {
+        $customer = User::create([
+            'name' => 'Hamburger Test User',
+            'email' => 'hamburger.test@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'customer',
+            'city' => 'Ahmedabad',
+        ]);
+
+        $response = $this->actingAs($customer)->get(route('customer.dashboard'));
+        $response->assertStatus(200);
+
+        // Verify hamburger button exists with proper ID, accessibility attributes, and click handler
+        $response->assertSee('id="sidebarToggle"', false);
+        $response->assertSee('aria-label="Toggle navigation menu"', false);
+        $response->assertSee('aria-controls="appSidebar"', false);
+        $response->assertSee('onclick="toggleSidebar(event)"', false);
+        $response->assertSee('id="appSidebar"', false);
+        $response->assertSee('id="sidebarBackdrop"', false);
+    }
 }
+
+

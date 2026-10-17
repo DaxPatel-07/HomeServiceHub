@@ -21,6 +21,14 @@ class HomeController extends Controller {
             ->orderByDesc('skill_score')
             ->take(4)->get();
 
+        if ($neighborhoodProviders->isEmpty()) {
+            $neighborhoodProviders = Provider::with(['user', 'category', 'badges'])
+                ->where('verification_status', 'verified')
+                ->where('is_active', true)
+                ->orderByDesc('skill_score')
+                ->take(4)->get();
+        }
+
         $stats = [
             'customers' => User::where('role', 'customer')->count(),
             'providers' => Provider::where('verification_status', 'verified')->count(),

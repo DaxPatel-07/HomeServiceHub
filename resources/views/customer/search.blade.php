@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title','Find Trusted Service Providers - Home Service Hub')
 @section('content')
-<div class="container" style="padding:2.5rem 0;">
+<div class="container py-4 py-lg-5">
   {{-- Search Header --}}
   <div class="mb-4">
     <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(232,165,26,.12);color:var(--gold);border-radius:20px;padding:.25rem .75rem;font-size:.78rem;font-weight:800;margin-bottom:.5rem;">
@@ -160,7 +160,9 @@
         </div>
         @endforeach
       </div>
-      <div class="mt-4">{{ $providers->withQueryString()->links() }}</div>
+      <div class="search-pagination-wrap mt-4">
+        {{ $providers->withQueryString()->links() }}
+      </div>
       @endif
     </div>
   </div>

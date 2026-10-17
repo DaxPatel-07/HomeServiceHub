@@ -146,7 +146,7 @@
         @else
           <a href="{{ route('login') }}" class="btn-primary-custom btn w-100 mb-2" style="justify-content:center;padding:.85rem;"><i class="fas fa-sign-in-alt me-2"></i>Login to Book</a>
         @endauth
-        <a href="{{ route('ai.assistant') }}" class="btn-outline-custom btn w-100" style="justify-content:center;"><i class="fas fa-robot me-2"></i>Chat with AI</a>
+
       </div>
     </div>
   </div>

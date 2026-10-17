@@ -13,6 +13,14 @@
 <div class="nav-item"><a href="javascript:void(0)" onclick="toggleFloatingChat()"><i class="fas fa-robot"></i>AI Assistant</a></div>
 <div class="nav-section-title">Account</div>
 <div class="nav-item"><a href="{{ route('customer.profile') }}"><i class="fas fa-user-circle"></i>My Profile</a></div>
+<div class="nav-item">
+  <form method="POST" action="{{ route('logout') }}" id="sidebarCustomerNavLogoutForm" style="display:none;">
+    @csrf
+  </form>
+  <a href="javascript:void(0)" onclick="document.getElementById('sidebarCustomerNavLogoutForm').submit();" style="color:#EF4444;font-weight:600;">
+    <i class="fas fa-sign-out-alt" style="color:#EF4444;"></i>Logout
+  </a>
+</div>
 @endsection
 @section('content')
 <div class="row g-4">
@@ -183,54 +191,221 @@
         @endforelse
       </div>
     </div>
+  </div>{{-- /col-lg-4 right panel --}}
 
-    {{-- AI Suggestions --}}
-    <div class="card-custom" style="background:linear-gradient(135deg,var(--brand-deep-blue),#1a3a6e);border:none;">
-      <div class="card-body-custom">
-        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
-          <div class="ai-avatar" style="width:40px;height:40px;font-size:1.1rem;">🤖</div>
-          <div><div style="color:#fff;font-weight:700;font-size:.9rem;">AI Suggestions</div><div style="color:rgba(255,255,255,.5);font-size:.75rem;">Based on your activity</div></div>
-        </div>
-        <p style="color:rgba(255,255,255,.7);font-size:.82rem;margin-bottom:1rem;">Need help? Try our AI assistant to diagnose issues and find verified pros near you.</p>
-        <button type="button" onclick="toggleFloatingChat()" class="btn-gold-custom btn btn-sm w-100" style="justify-content:center;cursor:pointer;"><i class="fas fa-robot me-2"></i>Open AI Assistant</button>
-      </div>
-    </div>
-  </div>
-
-  {{-- Recommended Neighborhood Trusted Providers --}}
-  <div class="col-12">
+  {{-- Neighbour Trusted Providers (Location-Based) --}}
+  <div class="col-12" id="neighbourhoodProvidersSection">
     <div class="card-custom">
-      <div class="card-header-custom">
-        <h6><i class="fas fa-heart me-2" style="color:var(--pink);"></i>Neighborhood Trusted Providers in {{ $userCity }}</h6>
-        <a href="{{ route('search') }}?city={{ $userCity }}&neighborhood_trusted=1" style="color:var(--brand-blue);font-size:.82rem;font-weight:600;">View All</a>
+      <div class="card-header-custom d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <h6 class="mb-0">
+            <i class="fas fa-heart me-2" style="color:var(--pink);"></i>Neighbour Trusted Providers
+          </h6>
+          @if(!$customerLocation['is_missing'])
+          <span class="badge" style="background:rgba(37,99,235,.08);color:var(--brand-deep-blue);border:1px solid rgba(37,99,235,.2);border-radius:20px;padding:.3rem .75rem;font-size:.75rem;font-weight:600;">
+            <i class="fas fa-map-marker-alt me-1 text-primary"></i>Near {{ $customerLocation['label'] }}
+          </span>
+          @endif
+        </div>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          {{-- Radius Selector --}}
+          <div class="d-inline-flex align-items-center gap-1">
+            <span style="font-size:.75rem;color:var(--text-muted);font-weight:600;"><i class="fas fa-bullseye me-1"></i>Radius:</span>
+            <select class="form-select form-select-sm" style="width:auto;display:inline-block;padding:.2rem 1.6rem .2rem .6rem;font-size:.75rem;border-radius:20px;" onchange="changeRadius(this.value)">
+              @foreach($radiusOptions as $r)
+                <option value="{{ $r }}" {{ (int)$currentRadius === (int)$r ? 'selected' : '' }}>{{ $r }} km</option>
+              @endforeach
+            </select>
+          </div>
+
+          {{-- Browser Location Button --}}
+          <button type="button" class="btn btn-sm btn-outline-primary" style="border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:600;" onclick="detectLocation(this)" title="Detect location via browser permission">
+            <i class="fas fa-crosshairs me-1"></i>Detect Location
+          </button>
+
+          {{-- Edit Location Button --}}
+          <button type="button" class="btn btn-sm" style="border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:600;background:var(--bg-light);border:1px solid var(--card-border);color:var(--brand-deep-blue);" data-bs-toggle="collapse" data-bs-target="#editLocationCollapse" aria-expanded="false">
+            <i class="fas fa-map-pin me-1"></i>Edit Location
+          </button>
+
+          <a href="{{ route('search') }}?neighborhood_trusted=1" style="color:var(--brand-blue);font-size:.82rem;font-weight:600;">View All</a>
+        </div>
       </div>
+
+      {{-- Collapsible Location Editor --}}
+      <div class="collapse {{ $locationStatus === 'missing_location' ? 'show' : '' }}" id="editLocationCollapse">
+        <div style="background:var(--brand-cream);border-bottom:1px solid var(--card-border);padding:1.25rem 1.5rem;">
+          <form method="POST" action="{{ route('customer.location.update') }}">
+            @csrf
+            <div class="row g-2 align-items-end">
+              <div class="col-md-3">
+                <label style="font-size:.75rem;font-weight:700;color:var(--brand-deep-blue);display:block;margin-bottom:.25rem;">Building / Society</label>
+                <input type="text" name="building" class="form-control form-control-sm" placeholder="e.g. Shivalik Heights" value="{{ old('building', $customerLocation['building']) }}">
+              </div>
+              <div class="col-md-3">
+                <label style="font-size:.75rem;font-weight:700;color:var(--brand-deep-blue);display:block;margin-bottom:.25rem;">Locality / Neighbourhood</label>
+                <input type="text" name="locality" class="form-control form-control-sm" placeholder="e.g. SG Highway, Satellite, Bopal" value="{{ old('locality', $customerLocation['locality']) }}">
+              </div>
+              <div class="col-md-3">
+                <label style="font-size:.75rem;font-weight:700;color:var(--brand-deep-blue);display:block;margin-bottom:.25rem;">City</label>
+                <select name="city" class="form-select form-select-sm">
+                  <option value="Ahmedabad" {{ ($customerLocation['city'] ?? $userCity) === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
+                  <option value="Gandhinagar" {{ ($customerLocation['city'] ?? $userCity) === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
+                </select>
+              </div>
+              <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-primary-custom flex-grow-1" style="padding:.35rem .75rem;font-size:.8rem;">
+                  <i class="fas fa-check me-1"></i>Save Location
+                </button>
+              </div>
+              <div class="col-12 mt-1">
+                <small class="text-muted" style="font-size:.72rem;">
+                  <i class="fas fa-shield-alt me-1 text-primary"></i>Your exact address is kept private and only used to match trusted providers in your immediate vicinity.
+                </small>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <div class="card-body-custom">
+        {{-- State 1: Missing Location Prompt --}}
+        @if($locationStatus === 'missing_location')
+        <div class="p-4 text-center" style="background:#fff;border-radius:12px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(37,99,235,.1);display:inline-flex;align-items:center;justify-content:center;color:var(--brand-blue);font-size:1.6rem;margin-bottom:.75rem;">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <h6 style="font-weight:800;color:var(--brand-deep-blue);margin-bottom:.35rem;">Set Your Neighbourhood Location</h6>
+          <p style="color:var(--text-secondary);font-size:.85rem;max-width:500px;margin:0 auto 1rem;">
+            Please enter your address, building, or allow browser location permission above so we can display verified service providers located right near you.
+          </p>
+          <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-primary-custom btn-sm" onclick="detectLocation(this)">
+              <i class="fas fa-crosshairs me-1"></i>Allow Location Access
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#editLocationCollapse">
+              <i class="fas fa-keyboard me-1"></i>Enter Address Manually
+            </button>
+          </div>
+        </div>
+
+        {{-- State 2: No Matches Found --}}
+        @elseif($locationStatus === 'no_matches' || $recommendedProviders->isEmpty())
+        <div class="p-4 text-center" style="background:#fff;border-radius:12px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(232,165,26,.15);display:inline-flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.6rem;margin-bottom:.75rem;">
+            <i class="fas fa-search-location"></i>
+          </div>
+          <h6 style="font-weight:800;color:var(--brand-deep-blue);margin-bottom:.35rem;">No trusted providers found near your location yet.</h6>
+          <p style="color:var(--text-secondary);font-size:.85rem;max-width:520px;margin:0 auto 1.25rem;">
+            We couldn't find verified professionals within <strong>{{ $currentRadius }} km</strong> of <strong>{{ $customerLocation['label'] }}</strong>. Try expanding your search radius or verifying your locality name.
+          </p>
+          <div class="d-flex justify-content-center gap-2 flex-wrap">
+            @if($currentRadius < 15)
+              <a href="?radius=15" class="btn btn-primary-custom btn-sm"><i class="fas fa-expand-arrows-alt me-1"></i>Expand Radius to 15 km</a>
+            @endif
+            @if($currentRadius < 25)
+              <a href="?radius=25" class="btn btn-outline-custom btn-sm"><i class="fas fa-expand-arrows-alt me-1"></i>Expand Radius to 25 km</a>
+            @endif
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#editLocationCollapse">
+              <i class="fas fa-edit me-1"></i>Change Location
+            </button>
+          </div>
+        </div>
+
+        {{-- State 3: Providers Found & Filtered --}}
+        @else
         <div class="row g-3">
           @foreach($recommendedProviders as $p)
-          <div class="col-md-3">
-            <div style="border:{{ $p->isNeighborhoodTrusted() ? '1.5px solid rgba(236,72,153,.35)' : '1px solid var(--card-border)' }};border-radius:14px;padding:1.2rem;text-align:center;transition:.2s;background:#fff;" onmouseover="this.style.boxShadow='var(--shadow)'" onmouseout="this.style.boxShadow='none'">
-              @if($p->isNeighborhoodTrusted())
-              <span style="background:rgba(236,72,153,.1);color:var(--pink);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:800;display:inline-block;margin-bottom:.5rem;">
-                <i class="fas fa-heart me-1"></i>Neighborhood Favorite
-              </span>
-              @endif
-              <div class="avatar-md mx-auto mb-2">{{ strtoupper(substr($p->name,0,1)) }}</div>
-              <div style="font-weight:700;font-size:.9rem;">{{ $p->name }}</div>
-              <div style="font-size:.78rem;color:var(--text-secondary);">{{ $p->category->name }}</div>
-              <div style="font-size:.75rem;color:var(--text-muted);margin-top:.2rem;"><i class="fas fa-map-marker-alt me-1" style="color:var(--brand-blue);"></i>{{ $p->service_area }}</div>
-              <div class="d-flex justify-content-center align-items-center gap-1 my-2">
-                <i class="fas fa-star" style="font-size:.75rem;color:var(--gold);"></i>
-                <span style="font-weight:700;font-size:.8rem;">{{ $p->average_rating }}</span>
-                <span style="font-size:.72rem;color:var(--text-muted);">({{ $p->completed_jobs }} jobs)</span>
+          <div class="col-md-6 col-xl-3">
+            <div class="h-100 d-flex flex-column justify-content-between" style="border:{{ $p->isNeighborhoodTrusted() ? '1.5px solid rgba(236,72,153,.35)' : '1px solid var(--card-border)' }};border-radius:14px;padding:1.2rem;text-align:center;transition:.2s;background:#fff;" onmouseover="this.style.boxShadow='var(--shadow)'" onmouseout="this.style.boxShadow='none'">
+              <div>
+                {{-- Badges Header --}}
+                <div class="d-flex justify-content-between align-items-center gap-1 mb-2 flex-wrap">
+                  @if($p->isNeighborhoodTrusted())
+                  <span style="background:rgba(236,72,153,.1);color:var(--pink);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:800;">
+                    <i class="fas fa-heart me-1"></i>Neighbour Choice
+                  </span>
+                  @endif
+
+                  {{-- Match Badge (e.g. Same Building, Serves your area) --}}
+                  @if($p->match_type === 'same_building' || (!empty($p->match_badge) && $p->match_badge !== $p->distance_text))
+                  <span style="background:rgba(16,185,129,.1);color:var(--success);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;">
+                    <i class="fas {{ $p->match_type === 'same_building' ? 'fa-building' : 'fa-check-circle' }} me-1"></i>{{ $p->match_badge }}
+                  </span>
+                  @endif
+
+                  {{-- Distance / Proximity Match Badge --}}
+                  @if(!empty($p->distance_text))
+                  <span style="background:rgba(37,99,235,.1);color:var(--brand-blue);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;" title="Calculated distance">
+                    <i class="fas fa-location-arrow me-1"></i>{{ $p->distance_text }}
+                  </span>
+                  @endif
+                </div>
+
+                <div class="avatar-md mx-auto mb-2">{{ strtoupper(substr($p->name,0,1)) }}</div>
+                <div style="font-weight:700;font-size:.9rem;color:var(--brand-deep-blue);">{{ $p->name }}</div>
+                <div style="font-size:.78rem;color:var(--text-secondary);">{{ $p->category->name }}</div>
+                <div style="font-size:.75rem;color:var(--text-muted);margin-top:.25rem;">
+                  <i class="fas fa-map-marker-alt me-1" style="color:var(--brand-blue);"></i>{{ $p->service_area }}
+                </div>
+                <div class="d-flex justify-content-center align-items-center gap-1 my-2">
+                  <i class="fas fa-star" style="font-size:.75rem;color:var(--gold);"></i>
+                  <span style="font-weight:700;font-size:.8rem;">{{ $p->average_rating }}</span>
+                  <span style="font-size:.72rem;color:var(--text-muted);">({{ $p->completed_jobs }} jobs)</span>
+                </div>
               </div>
-              <div style="font-weight:800;color:var(--brand-blue);font-size:.88rem;margin-bottom:.5rem;">₹{{ number_format($p->hourly_rate) }}/hr</div>
-              <a href="{{ route('provider.show',$p) }}" class="btn-primary-custom btn btn-sm w-100" style="justify-content:center;padding:.4rem;">View &amp; Book</a>
+
+              <div>
+                <div style="font-weight:800;color:var(--brand-blue);font-size:.88rem;margin-bottom:.5rem;">₹{{ number_format($p->hourly_rate) }}/hr</div>
+                <a href="{{ route('provider.show',$p) }}" class="btn-primary-custom btn btn-sm w-100" style="justify-content:center;padding:.4rem;">View &amp; Book</a>
+              </div>
             </div>
           </div>
           @endforeach
         </div>
+        @endif
       </div>
     </div>
   </div>
 </div>
 @endsection
+@push('scripts')
+<script>
+function detectLocation(btn) {
+  if (!navigator.geolocation) {
+    alert('Geolocation is not supported by your browser.');
+    return;
+  }
+  const originalHtml = btn ? btn.innerHTML : '';
+  if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Detecting...';
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      const url = new URL(window.location.href);
+      url.searchParams.set('lat', lat);
+      url.searchParams.set('lng', lng);
+      window.location.href = url.toString();
+    },
+    function(error) {
+      if (btn) btn.innerHTML = originalHtml;
+      alert('Unable to retrieve location permission. You can enter your neighbourhood address manually below.');
+      const collapseEl = document.getElementById('editLocationCollapse');
+      if (collapseEl && typeof bootstrap !== 'undefined') {
+        const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl);
+        bsCollapse.show();
+      }
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+}
+
+function changeRadius(radius) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('radius', radius);
+  window.location.href = url.toString();
+}
+</script>
+@endpush

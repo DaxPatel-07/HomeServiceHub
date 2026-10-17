@@ -5,8 +5,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Provider extends Model {
     use HasFactory;
-    protected $fillable = ['user_id','category_id','business_name','bio','experience_years','service_area','hourly_rate','skill_score','total_jobs','completed_jobs','average_rating','verification_status','is_available','is_active','id_proof','certificate'];
-    protected $casts = ['is_available' => 'boolean', 'is_active' => 'boolean', 'skill_score' => 'float', 'average_rating' => 'float'];
+    protected $fillable = ['user_id','category_id','business_name','bio','experience_years','service_area','hourly_rate','skill_score','total_jobs','completed_jobs','average_rating','verification_status','is_available','is_active','id_proof','certificate','latitude','longitude','locality','building','postal_code','service_radius_km'];
+    protected $casts = ['is_available' => 'boolean', 'is_active' => 'boolean', 'skill_score' => 'float', 'average_rating' => 'float', 'latitude' => 'float', 'longitude' => 'float', 'service_radius_km' => 'float'];
 
     public function user() { return $this->belongsTo(User::class); }
     public function category() { return $this->belongsTo(ServiceCategory::class, 'category_id'); }

@@ -43,6 +43,7 @@ Route::post('/ai/suggest-service', [ChatController::class, 'suggestService'])->n
 // Customer routes
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer.')->group(function () {
     Route::get('/dashboard', [CustomerDashboard::class, 'index'])->name('dashboard');
+    Route::post('/location', [CustomerDashboard::class, 'updateLocation'])->name('location.update');
     Route::get('/book/{provider}', [CustomerBooking::class, 'showBooking'])->name('book');
     Route::post('/book', [CustomerBooking::class, 'store'])->name('book.store');
     Route::get('/split-booking', [CustomerBooking::class, 'showSplitBooking'])->name('split.booking');
@@ -76,8 +77,9 @@ Route::middleware(['auth', 'role:provider'])->prefix('provider')->name('provider
     Route::post('/availability', [ProviderProfile::class, 'toggleAvailability'])->name('availability');
 });
 
-// Public provider profile - MUST be after the authenticated provider group to avoid wildcard conflict
+// Provider profile (requires authentication for full details) - MUST be after the authenticated provider group to avoid wildcard conflict
 Route::get('/provider/{provider}', [SearchController::class, 'providerProfile'])->name('provider.show');
+Route::get('/api/providers/{provider}', [SearchController::class, 'apiProviderDetails'])->name('api.provider.show');
 
 // Admin routes
 Route::middleware(['auth', 'role:admin,master_admin'])->prefix('admin')->name('admin.')->group(function () {

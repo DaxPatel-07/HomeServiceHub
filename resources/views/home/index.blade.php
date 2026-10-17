@@ -168,7 +168,7 @@
 </section>
 @endguest
 
-{{-- NEIGHBORHOOD TRUSTED PROVIDERS (Ahmedabad & Gandhinagar) --}}
+{{-- NEIGHBOUR TRUSTED PROVIDERS (Ahmedabad & Gandhinagar) --}}
 @if(isset($neighborhoodProviders) && $neighborhoodProviders->isNotEmpty())
 <section class="section" style="background:linear-gradient(180deg, rgba(232,165,26,.04) 0%, rgba(255,255,255,1) 100%);padding:4rem 0;">
   <div class="container">
@@ -177,49 +177,122 @@
         <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(236,72,153,.1);color:var(--pink);border-radius:20px;padding:.3rem .8rem;font-size:.75rem;font-weight:800;margin-bottom:.5rem;">
           <i class="fas fa-heart"></i> Local Community Verified
         </div>
-        <h2 class="section-title">🏡 Neighborhood <span>Trusted Providers</span></h2>
-        <p class="section-subtitle">Highly rated, background-checked professionals serving Ahmedabad &amp; Gandhinagar</p>
+        <h2 class="section-title">🏡 Neighbour <span>Trusted Providers</span></h2>
+        @guest
+          <p class="section-subtitle">Discover community-endorsed, background-checked professionals serving your local neighbourhood in Ahmedabad &amp; Gandhinagar. Sign in to view verified full profiles, direct pricing, ratings, reviews, and book trusted providers.</p>
+        @else
+          <p class="section-subtitle">Verified, highly-rated professionals trusted and endorsed by neighbours across Ahmedabad &amp; Gandhinagar</p>
+        @endguest
       </div>
-      <a href="{{ route('search') }}?neighborhood_trusted=1" class="btn-primary-custom btn btn-sm"><i class="fas fa-filter me-1"></i>View All Neighborhood Trusted</a>
+      <a href="{{ route('search') }}?neighborhood_trusted=1" class="btn-primary-custom btn btn-sm"><i class="fas fa-filter me-1"></i>View All Neighbour Trusted</a>
     </div>
+
+    @guest
+    {{-- Attractive Preview Cards for Logged-Out Visitors (No sensitive info disclosed) --}}
     <div class="row g-4">
       @foreach($neighborhoodProviders as $provider)
       <div class="col-md-6 col-lg-3">
-        <div class="provider-card p-3" style="border:1.5px solid rgba(236,72,153,.3);box-shadow:0 8px 24px rgba(236,72,153,.08);">
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <span style="background:var(--pink);color:#fff;border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:800;">
-              <i class="fas fa-check me-1"></i>Neighbor Choice
-            </span>
-            <span style="font-size:.72rem;color:var(--text-muted);">{{ round($provider->skill_score) }} Skill Score</span>
-          </div>
-          <div class="d-flex align-items-start gap-3 mb-2">
-            <div class="provider-avatar" style="width:48px;height:48px;font-size:1.2rem;">{{ strtoupper(substr($provider->name,0,1)) }}</div>
-            <div class="flex-grow-1">
-              <h6 class="mb-0 fw-700" style="font-weight:800;font-size:.92rem;">{{ $provider->name }}</h6>
-              <div style="color:var(--text-secondary);font-size:.78rem;">{{ $provider->category->name }}</div>
-              <div class="d-flex align-items-center gap-1 mt-1">
-                <i class="fas fa-star" style="color:var(--gold);font-size:.72rem;"></i>
-                <span style="font-size:.78rem;font-weight:700;">{{ $provider->average_rating }}</span>
-                <span style="font-size:.72rem;color:var(--text-muted);">({{ $provider->completed_jobs }} jobs)</span>
+        <div class="provider-card p-3 d-flex flex-column justify-content-between h-100"
+             style="border:1.5px solid rgba(236,72,153,.3);box-shadow:0 8px 24px rgba(236,72,153,.08);cursor:pointer;position:relative;background:#fff;"
+             onclick="window.location.href='{{ route('provider.show', $provider) }}'"
+             title="Click to log in and view full provider profile">
+          <div>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span style="background:var(--pink);color:#fff;border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:800;">
+                <i class="fas fa-check me-1"></i>Neighbour Choice
+              </span>
+              <span style="background:rgba(37,99,235,.08);color:var(--brand-blue);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;">
+                <i class="fas fa-shield-alt me-1"></i>Verified Pro
+              </span>
+            </div>
+
+            <div class="d-flex align-items-start gap-3 mb-2">
+              <div class="provider-avatar" style="width:48px;height:48px;font-size:1.2rem;background:linear-gradient(135deg, var(--brand-blue), var(--brand-deep-blue));">
+                <i class="{{ $provider->category->icon ?? 'fas fa-tools' }}"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-0 fw-700" style="font-weight:800;font-size:.92rem;color:var(--brand-deep-blue);">
+                  Verified {{ $provider->category->name ?? 'Service' }} Pro
+                </h6>
+                <div style="color:var(--text-secondary);font-size:.78rem;">{{ $provider->category->name ?? 'Professional' }} &bull; Local Expert</div>
+                <div class="d-flex align-items-center gap-1 mt-1">
+                  <i class="fas fa-star" style="color:var(--gold);font-size:.72rem;"></i>
+                  <span style="font-size:.78rem;font-weight:700;color:var(--text-primary);">Top Rated Neighbour Pro</span>
+                </div>
               </div>
             </div>
+
+            <div style="font-size:.75rem;color:var(--text-secondary);margin-bottom:.5rem;">
+              <i class="fas fa-map-marker-alt me-1" style="color:var(--brand-blue);"></i>Ahmedabad &amp; Gandhinagar Network
+            </div>
+
+            <div style="background:rgba(37,99,235,.05);border-radius:8px;padding:.45rem .65rem;margin-bottom:.75rem;font-size:.73rem;color:var(--text-secondary);display:flex;align-items:center;gap:.4rem;">
+              <i class="fas fa-lock" style="color:var(--brand-blue);font-size:.72rem;"></i>
+              <span>Sign in to unlock full name, rates &amp; reviews</span>
+            </div>
           </div>
-          <div style="font-size:.75rem;color:var(--text-secondary);margin-bottom:.5rem;">
-            <i class="fas fa-map-marker-alt me-1" style="color:var(--brand-blue);"></i>{{ $provider->service_area }}
-          </div>
+
           <div class="d-flex justify-content-between align-items-center mt-2 pt-2" style="border-top:1px solid var(--card-border);">
-            <div style="font-weight:800;color:var(--brand-blue);font-size:.88rem;">₹{{ number_format($provider->hourly_rate) }}/hr</div>
-            <a href="{{ route('provider.show', $provider) }}" class="btn-primary-custom btn btn-sm" style="padding:.3rem .75rem;font-size:.78rem;">View Profile</a>
+            <div style="font-size:.78rem;font-weight:700;color:var(--text-muted);">
+              <i class="fas fa-tag me-1"></i>Protected Rate
+            </div>
+            <a href="{{ route('provider.show', $provider) }}" class="btn-primary-custom btn btn-sm" style="padding:.35rem .85rem;font-size:.78rem;" onclick="event.stopPropagation();">
+              <i class="fas fa-lock me-1"></i>View Details
+            </a>
           </div>
         </div>
       </div>
       @endforeach
     </div>
+    @else
+    {{-- Full Details Cards for Logged-In Customers / Authenticated Users --}}
+    <div class="row g-4">
+      @foreach($neighborhoodProviders as $provider)
+      <div class="col-md-6 col-lg-3">
+        <div class="provider-card p-3 d-flex flex-column justify-content-between h-100" style="border:1.5px solid rgba(236,72,153,.3);box-shadow:0 8px 24px rgba(236,72,153,.08);">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span style="background:var(--pink);color:#fff;border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:800;">
+                <i class="fas fa-check me-1"></i>Neighbour Choice
+              </span>
+              <span style="font-size:.72rem;color:var(--text-muted);">{{ round($provider->skill_score) }} Skill Score</span>
+            </div>
+            <div class="d-flex align-items-start gap-3 mb-2">
+              <div class="provider-avatar" style="width:48px;height:48px;font-size:1.2rem;">{{ strtoupper(substr($provider->name,0,1)) }}</div>
+              <div class="flex-grow-1">
+                <h6 class="mb-0 fw-700" style="font-weight:800;font-size:.92rem;">{{ $provider->name }}</h6>
+                <div style="color:var(--text-secondary);font-size:.78rem;">{{ $provider->category->name }}</div>
+                <div class="d-flex align-items-center gap-1 mt-1">
+                  <i class="fas fa-star" style="color:var(--gold);font-size:.72rem;"></i>
+                  <span style="font-size:.78rem;font-weight:700;">{{ $provider->average_rating }}</span>
+                  <span style="font-size:.72rem;color:var(--text-muted);">({{ $provider->completed_jobs }} jobs)</span>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:.75rem;color:var(--text-secondary);margin-bottom:.5rem;">
+              <i class="fas fa-map-marker-alt me-1" style="color:var(--brand-blue);"></i>{{ $provider->service_area }}
+            </div>
+            <div class="d-flex gap-1 flex-wrap mb-2">
+              @foreach($provider->badges->take(2) as $badge)
+              <span style="background:rgba(232,165,26,.1);color:var(--gold);border-radius:20px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;"><i class="{{ $badge->icon }} me-1"></i>{{ $badge->name }}</span>
+              @endforeach
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-2 pt-2" style="border-top:1px solid var(--card-border);">
+            <div style="font-weight:800;color:var(--brand-blue);font-size:.88rem;">₹{{ number_format($provider->hourly_rate) }}/hr</div>
+            <a href="{{ route('provider.show', $provider) }}" class="btn-primary-custom btn btn-sm" style="padding:.35rem .85rem;font-size:.78rem;">View Details</a>
+          </div>
+        </div>
+      </div>
+      @endforeach
+    </div>
+    @endguest
   </div>
 </section>
 @endif
 
-{{-- POPULAR PROVIDERS --}}
+{{-- POPULAR PROVIDERS (Only for Authenticated Users) --}}
+@auth
 <section class="section">
   <div class="container">
     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -254,7 +327,7 @@
               <div style="font-size:.8rem;color:var(--text-secondary);"><i class="fas fa-map-marker-alt me-1" style="color:var(--brand-blue);"></i>{{ $provider->service_area }}</div>
               <div style="font-size:.85rem;font-weight:700;color:var(--brand-blue);margin-top:.25rem;">₹{{ number_format($provider->hourly_rate) }}/hr</div>
             </div>
-            <a href="{{ route('provider.show', $provider) }}" class="btn-primary-custom btn btn-sm">Book Now</a>
+            <a href="{{ route('provider.show', $provider) }}" class="btn-primary-custom btn btn-sm">View Details</a>
           </div>
           <div class="divider"></div>
           <div class="d-flex gap-2 flex-wrap">
@@ -268,6 +341,7 @@
     </div>
   </div>
 </section>
+@endauth
 
 {{-- HOW IT WORKS --}}
 <section class="section" style="background:var(--bg-light);">
@@ -293,40 +367,6 @@
   </div>
 </section>
 
-{{-- AI SECTION --}}
-<section class="section" style="background:linear-gradient(135deg,var(--brand-deep-blue),#1a3a6e);">
-  <div class="container">
-    <div class="row align-items-center gy-4">
-      <div class="col-lg-6">
-        <div style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(232,165,26,.15);border:1px solid rgba(232,165,26,.3);border-radius:20px;padding:.35rem .9rem;margin-bottom:1rem;">
-          <i class="fas fa-robot" style="color:var(--gold);"></i>
-          <span style="color:var(--gold);font-size:.8rem;font-weight:700;">Powered by Gemini AI</span>
-        </div>
-        <h2 style="font-size:2rem;font-weight:800;color:#fff;line-height:1.2;">AI Assistant That <span style="color:var(--gold);">Understands</span> Your Needs</h2>
-        <p style="color:rgba(255,255,255,.6);margin-top:1rem;">Describe your home problem in plain language. Our AI will identify the right service category, recommend top providers, and help you book — all in one conversation.</p>
-        <div class="d-flex gap-3 mt-2 flex-wrap">
-          @foreach(['Smart Diagnostics','Provider Matching','Instant Booking Help'] as $f)
-          <div style="display:flex;align-items:center;gap:.4rem;"><i class="fas fa-check-circle" style="color:var(--gold);"></i><span style="color:rgba(255,255,255,.7);font-size:.85rem;">{{ $f }}</span></div>
-          @endforeach
-        </div>
-        <button type="button" onclick="toggleFloatingChat()" class="btn-gold-custom btn mt-3" style="cursor:pointer;"><i class="fas fa-robot me-2"></i>Try AI Assistant</button>
-      </div>
-      <div class="col-lg-6">
-        <div class="ai-chat-container" style="height:320px;max-width:480px;">
-          <div class="ai-chat-header">
-            <div class="ai-avatar">🤖</div>
-            <div><div style="color:#fff;font-weight:700;font-size:.95rem;">AI Assistant</div><div style="color:rgba(255,255,255,.5);font-size:.75rem;">Powered by Gemini</div></div>
-          </div>
-          <div class="ai-chat-messages">
-            <div class="message-bubble ai"><div class="bubble">Hello! I can help you find the right home service. What issue are you facing? 🏠</div></div>
-            <div class="message-bubble user"><div class="bubble">My AC is not cooling properly</div></div>
-            <div class="message-bubble ai"><div class="bubble">Sounds like an AC issue! ❄️ I recommend booking an <strong>AC Technician</strong>. We have 5 verified experts near you, available today. Want me to show their profiles?</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 {{-- SPLIT BOOKING PROMO --}}
 <section class="section">

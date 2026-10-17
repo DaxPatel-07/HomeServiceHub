@@ -13,6 +13,14 @@
 <div class="nav-item"><a href="javascript:void(0)" onclick="toggleFloatingChat()"><i class="fas fa-robot"></i>AI Assistant</a></div>
 <div class="nav-section-title">Account</div>
 <div class="nav-item"><a href="{{ route('customer.profile') }}" class="active"><i class="fas fa-user-circle"></i>My Profile</a></div>
+<div class="nav-item">
+  <form method="POST" action="{{ route('logout') }}" id="sidebarCustomerNavLogoutForm" style="display:none;">
+    @csrf
+  </form>
+  <a href="javascript:void(0)" onclick="document.getElementById('sidebarCustomerNavLogoutForm').submit();" style="color:#EF4444;font-weight:600;">
+    <i class="fas fa-sign-out-alt" style="color:#EF4444;"></i>Logout
+  </a>
+</div>
 @endsection
 
 @section('content')
@@ -70,6 +78,15 @@
           </div>
         </div>
       </div>
+
+      <div class="divider"></div>
+
+      <form method="POST" action="{{ route('logout') }}" class="m-0">
+        @csrf
+        <button type="submit" class="btn btn-sm w-100 d-flex align-items-center justify-content-center gap-2" style="background:rgba(239,68,68,.08);color:#EF4444;border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:.6rem;font-weight:700;font-size:.85rem;transition:var(--transition);" onmouseover="this.style.background='#EF4444';this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,.08)';this.style.color='#EF4444';">
+          <i class="fas fa-sign-out-alt"></i>Logout from Account
+        </button>
+      </form>
     </div>
   </div>
 

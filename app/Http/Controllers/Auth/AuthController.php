@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller {
-    public function showLogin() { return view('auth.login'); }
+    public function showLogin(Request $request) {
+        if ($request->filled('redirect')) {
+            session()->put('url.intended', $request->query('redirect'));
+        }
+        return view('auth.login');
+    }
 
     public function login(Request $request) {
         $request->validate(['email' => 'required|email', 'password' => 'required']);
@@ -17,12 +22,17 @@ class AuthController extends Controller {
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
             $user = Auth::user();
+
+            if ($request->filled('redirect') && !str_contains($request->input('redirect'), 'login')) {
+                return redirect()->to($request->input('redirect'));
+            }
+
             return match($user->role) {
-                'customer' => redirect()->route('customer.dashboard'),
+                'customer' => redirect()->intended(route('customer.dashboard')),
                 'provider' => redirect()->route('provider.dashboard'),
                 'admin' => redirect()->route('admin.dashboard'),
                 'master_admin' => redirect()->route('master.dashboard'),
-                default => redirect()->route('home'),
+                default => redirect()->intended(route('home')),
             };
         }
         return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();

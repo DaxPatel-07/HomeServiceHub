@@ -13,7 +13,7 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FDF8F4;
+            background-color: #FDF9F0;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -253,7 +253,7 @@
             margin-bottom: 22px;
         }
         .btn-google:hover {
-            background: #F7F0E8;
+            background: #E8DDD0;
             border-color: #B8AFA7;
             color: #1A1208;
         }
@@ -317,6 +317,13 @@
         <p>Log in to manage your home services.</p>
     </div>
 
+    @if(session('info'))
+    <div style="background:#EFF6FF;border:1px solid #93C5FD;border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13.5px;color:#1D4ED8;font-weight:500;">
+        <i class="fas fa-info-circle" style="font-size:16px;color:#2563EB;flex-shrink:0;"></i>
+        <span>{{ session('info') }}</span>
+    </div>
+    @endif
+
     @if($errors->any())
     <div class="alert-error">
         <i class="fas fa-exclamation-circle"></i>
@@ -327,6 +334,9 @@
     <form method="POST" action="{{ route('login.post') }}">
         @csrf
         <input type="hidden" name="login_role" id="loginRole" value="customer">
+        @if(request('redirect'))
+        <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+        @endif
 
         <!-- Email -->
         <div class="field-group">
