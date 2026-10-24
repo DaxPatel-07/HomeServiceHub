@@ -8,6 +8,10 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable {
     use HasFactory, Notifiable;
 
+    protected $attributes = [
+        'is_active' => true,
+    ];
+
     protected $fillable = ['name','email','password','role','phone','address','city','state','avatar','is_active','latitude','longitude','locality','building','postal_code'];
     protected $hidden = ['password','remember_token'];
     protected $casts = ['email_verified_at' => 'datetime', 'password' => 'hashed', 'is_active' => 'boolean', 'latitude' => 'float', 'longitude' => 'float'];

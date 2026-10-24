@@ -10,5 +10,6 @@ class SplitBooking extends Model {
 
     public function customer() { return $this->belongsTo(User::class, 'customer_id'); }
     public function items() { return $this->hasMany(SplitBookingItem::class); }
+    public function bookings() { return $this->hasMany(Booking::class, 'split_booking_id'); }
     public static function generateCode() { return 'SP-' . strtoupper(uniqid()); }
 }

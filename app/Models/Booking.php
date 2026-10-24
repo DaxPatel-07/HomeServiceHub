@@ -13,6 +13,7 @@ class Booking extends Model {
     public function category() { return $this->belongsTo(ServiceCategory::class, 'category_id'); }
     public function review() { return $this->hasOne(Review::class); }
     public function complaint() { return $this->hasOne(Complaint::class); }
+    public function splitBooking() { return $this->belongsTo(SplitBooking::class, 'split_booking_id'); }
 
     public static function generateCode() { return 'BK-' . strtoupper(uniqid()); }
     public function getStatusBadgeAttribute() {

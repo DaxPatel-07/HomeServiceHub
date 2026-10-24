@@ -6,16 +6,24 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Home Service Hub') - Trusted Home Services</title>
     <meta name="description" content="@yield('meta_description', 'Find trusted local home service providers - electricians, plumbers, carpenters, painters, AC technicians and more.')">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/homeservicehub-icon.svg') }}">
+    <link rel="alternate icon" type="image/png" href="{{ asset('images/homeservicehub-icon.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     @stack('styles')
 </head>
 <body>
+    <a href="#mainContent" class="skip-to-content">Skip to main content</a>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-main">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}"><i class="fas fa-tools me-2" style="color:var(--brand-blue)"></i>Home<span>ServiceHub</span></a>
+            <a class="navbar-brand d-inline-flex align-items-center" href="{{ route('home') }}" aria-label="HomeServiceHub Home">
+                <img src="{{ asset('images/logo-horizontal.svg') }}" alt="HomeServiceHub" height="38" class="brand-logo-img">
+            </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -25,9 +33,9 @@
                     <li class="nav-item"><a class="nav-link" href="{{ route('search') }}">Services</a></li>
                     <li class="nav-item">
                         @if(request()->routeIs('home'))
-                            <a class="nav-link" href="javascript:void(0)" onclick="toggleFloatingChat()"><i class="fas fa-robot me-1" style="color:var(--brand-blue)"></i>AI Assistant</a>
+                            <a class="nav-link" href="javascript:void(0)" onclick="toggleFloatingChat()"><i class="fas fa-robot me-1" style="color:var(--color-primary)"></i>AI Assistant</a>
                         @else
-                            <a class="nav-link" href="{{ route('home') }}?open_ai=1"><i class="fas fa-robot me-1" style="color:var(--brand-blue)"></i>AI Assistant</a>
+                            <a class="nav-link" href="{{ route('home') }}?open_ai=1"><i class="fas fa-robot me-1" style="color:var(--color-primary)"></i>AI Assistant</a>
                         @endif
                     </li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('search') }}">Find Providers</a></li>
@@ -73,14 +81,20 @@
         </div>
     @endif
 
-    @yield('content')
+    <main id="mainContent">
+        @yield('content')
+    </main>
 
     <!-- Footer -->
     <footer class="site-footer">
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="footer-brand"><i class="fas fa-tools me-2"></i>HomeServiceHub</div>
+                    <div class="footer-brand mb-2">
+                        <a href="{{ route('home') }}" aria-label="HomeServiceHub Home" style="display:inline-block;text-decoration:none;">
+                            <img src="{{ asset('images/logo.svg') }}" alt="HomeServiceHub" height="42" class="brand-logo-img">
+                        </a>
+                    </div>
                     <p class="footer-desc">Connecting you with trusted home service professionals in your neighborhood.</p>
                     <div class="d-flex gap-3 mt-3">
                         <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
@@ -106,13 +120,18 @@
                 </div>
                 <div class="col-md-4">
                     <h6>Contact Us</h6>
-                    <p style="color:rgba(255,255,255,.5);font-size:.85rem;"><i class="fas fa-phone me-2" style="color:var(--gold);"></i> +91 1800-HSH-HELP</p>
-                    <p style="color:rgba(255,255,255,.5);font-size:.85rem;"><i class="fas fa-envelope me-2" style="color:var(--gold);"></i> support@hsh.com</p>
-                    <p style="color:rgba(255,255,255,.5);font-size:.85rem;"><i class="fas fa-map-marker-alt me-2" style="color:var(--gold);"></i> Mumbai, India</p>
+                    <p style="font-size:.85rem;"><i class="fas fa-phone me-2" style="color:var(--color-primary);"></i> +91 1800-HSH-HELP</p>
+                    <p style="font-size:.85rem;"><i class="fas fa-envelope me-2" style="color:var(--color-primary);"></i> support@hsh.com</p>
+                    <p style="font-size:.85rem;"><i class="fas fa-map-marker-alt me-2" style="color:var(--color-primary);"></i> Ahmedabad &amp; Gandhinagar, Gujarat</p>
                 </div>
             </div>
-            <div class="footer-bottom">
+            <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <p>&copy; {{ date('Y') }} HomeServiceHub. All rights reserved.</p>
+                <div class="d-flex gap-3" style="font-size:.82rem;">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Security</a>
+                </div>
             </div>
         </div>
     </footer>

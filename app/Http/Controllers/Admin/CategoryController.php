@@ -11,7 +11,7 @@ class CategoryController extends Controller {
         return view('admin.categories', compact('categories'));
     }
     public function store(Request $request) {
-        $request->validate(['name'=>'required|string|max:100','description'=>'nullable|string','icon'=>'nullable|string','color'=>'nullable|string']);
+        $request->validate(['name'=>'required|string|max:100|unique:service_categories,name','description'=>'nullable|string|max:1000','icon'=>'nullable|string|max:50','color'=>'nullable|string|max:20']);
         ServiceCategory::create(array_merge($request->only('name','description','icon','color'), ['slug' => Str::slug($request->name)]));
         return back()->with('success', 'Category created!');
     }

@@ -110,7 +110,7 @@ new Chart(document.getElementById('bookingChart'),{
   type:'doughnut',
   data:{
     labels:['Completed','Pending','Accepted','Cancelled'],
-    datasets:[{data:[bData.completed||0,bData.pending||0,bData.accepted||0,bData.cancelled||0],backgroundColor:['#10B981','#E8A51A','#2563EB','#EF4444'],borderWidth:0}]
+    datasets:[{data:[bData.completed||0,bData.pending||0,bData.accepted||0,bData.cancelled||0],backgroundColor:['#1E7A4F','#D97706','#2451BD','#B3261E'],borderWidth:0}]
   },
   options:{responsive:true,cutout:'70%',plugins:{legend:{position:'bottom'}}}
 });

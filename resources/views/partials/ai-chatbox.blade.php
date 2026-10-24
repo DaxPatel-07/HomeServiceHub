@@ -72,8 +72,8 @@
 
   <!-- Suggested Questions Section (Inside chatbox, above message input) -->
   <div class="ai-suggested-section">
-    <div class="ai-suggested-label">
-      <i class="fas fa-sparkles me-1 text-primary"></i>Suggested Questions:
+    <div class="ai-suggested-label" style="color:#475569;font-weight:700;">
+      <i class="fas fa-sparkles me-1" style="color:var(--gold);"></i>Suggested Questions:
     </div>
     <div class="ai-suggested-chips">
       @foreach($suggestedQuestions as $q)

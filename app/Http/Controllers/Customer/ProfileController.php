@@ -2,7 +2,6 @@
 namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\MaintenanceReminder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,13 +22,17 @@ class ProfileController extends Controller {
     public function update(Request $request) {
         $user = Auth::user();
         $request->validate([
-            'name'  => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email,'.$user->id,
-            'phone' => 'nullable|string|max:20',
-            'city'  => 'nullable|in:Ahmedabad,Gandhinagar',
+            'name'    => 'required|string|max:100',
+            'email'   => 'nullable|email|unique:users,email,'.$user->id,
+            'phone'   => 'nullable|string|max:20',
+            'city'    => 'nullable|in:Ahmedabad,Gandhinagar',
             'address' => 'nullable|string|max:255',
         ]);
-        $user->update($request->only('name','email','phone','city','address'));
+        $data = $request->only('name','phone','city','address');
+        if ($request->filled('email')) {
+            $data['email'] = $request->email;
+        }
+        $user->update($data);
         return back()->with('success', 'Profile updated successfully!');
     }
 

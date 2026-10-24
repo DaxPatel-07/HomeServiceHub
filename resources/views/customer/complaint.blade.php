@@ -9,14 +9,6 @@
 <div class="nav-item"><a href="{{ route('customer.bookings') }}" ><i class="fas fa-calendar-check"></i>My Bookings</a></div>
 <div class="nav-section-title">Account</div>
 <div class="nav-item"><a href="{{ route('customer.profile') }}"><i class="fas fa-user-circle"></i>My Profile</a></div>
-<div class="nav-item">
-  <form method="POST" action="{{ route('logout') }}" id="sidebarCustomerNavLogoutForm" style="display:none;">
-    @csrf
-  </form>
-  <a href="javascript:void(0)" onclick="document.getElementById('sidebarCustomerNavLogoutForm').submit();" style="color:#EF4444;font-weight:600;">
-    <i class="fas fa-sign-out-alt" style="color:#EF4444;"></i>Logout
-  </a>
-</div>
 @endsection
 
 @section('content')
@@ -25,7 +17,7 @@
   <div class="col-lg-7">
     <div class="card-custom p-4">
       <!-- Booking Preview Card (complaint.jpeg) -->
-      <div class="d-flex align-items-center justify-content-between p-3 mb-4" style="background:var(--brand-cream);border-radius:12px;border:1px solid var(--card-border);">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 p-3 mb-4" style="background:var(--brand-cream);border-radius:12px;border:1px solid var(--card-border);">
         <div class="d-flex align-items-center gap-3">
           <div class="avatar-sm" style="background:var(--brand-blue);color:#fff;">
             {{ strtoupper(substr($booking->provider->name, 0, 1)) }}
@@ -75,7 +67,7 @@
           <button type="submit" class="btn-primary-custom btn" style="justify-content:center;padding:.75rem 1.8rem;border-radius:10px;">
             <i class="fas fa-paper-plane me-2"></i>Submit Complaint
           </button>
-          <a href="{{ route('customer.booking.show', $booking) }}" class="btn" style="background:#fff;border:1.5px solid var(--card-border);border-radius:10px;padding:.75rem 1.5rem;font-weight:600;font-size:.88rem;color:var(--text-secondary);">Cancel</a>
+          <a href="{{ route('customer.booking.show', $booking) }}" class="btn" style="background:#fff;border:1.5px solid var(--card-border);border-radius:10px;padding:.75rem 1.5rem;font-weight:600;font-size:.88rem;color:var(--color-text-dark);">Cancel</a>
         </div>
       </form>
     </div>

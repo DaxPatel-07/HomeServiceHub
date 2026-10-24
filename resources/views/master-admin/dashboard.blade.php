@@ -134,8 +134,8 @@ new Chart(document.getElementById('analyticsChart'),{
   data:{
     labels: mData.map(d=>months2[d.month-1]),
     datasets:[
-      {label:'Bookings',data:mData.map(d=>d.bookings),backgroundColor:'rgba(232,165,26,.85)',borderRadius:6},
-      {label:'Revenue (₹)',data:mData.map(d=>d.revenue),backgroundColor:'rgba(37,99,235,.7)',borderRadius:6,yAxisID:'y1'}
+      {label:'Bookings',data:mData.map(d=>d.bookings),backgroundColor:'rgba(36,81,189,.85)',borderRadius:6},
+      {label:'Revenue (₹)',data:mData.map(d=>d.revenue),backgroundColor:'rgba(25,83,188,.65)',borderRadius:6,yAxisID:'y1'}
     ]
   },
   options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'#f0f0f0'}},y1:{position:'right',grid:{display:false}}}}

@@ -330,7 +330,7 @@ class GeminiService {
 
             // 5. What services can I book?
             if (preg_match('/(what services can i book|services available|what services do you (provide|offer)|show services)/i', $lower)) {
-                $categories = \App\Models\ServiceCategory::where('is_active', true)->get();
+                $categories = ServiceCategory::where('is_active', true)->get();
                 $catList = "";
                 foreach ($categories as $c) {
                     $catList .= "• **{$c->name}** — {$c->description}\n";
@@ -367,7 +367,7 @@ class GeminiService {
 
         // 2. Services Available / What services are available / "what services do you provide"
         if (preg_match('/(what services|services available|services do you (provide|offer)|list of services|available services)/i', $lower)) {
-            $categories = \App\Models\ServiceCategory::where('is_active', true)->get();
+            $categories = ServiceCategory::where('is_active', true)->get();
             $catList = "";
             foreach ($categories as $c) {
                 $catList .= "• **{$c->name}**: {$c->description}\n";
@@ -395,7 +395,7 @@ class GeminiService {
 
         // 4. Show available providers
         if (preg_match('/(show (available )?providers|available providers|find providers|top providers|recommend providers)/i', $lower)) {
-            $topPros = \App\Models\Provider::with(['user', 'category'])
+            $topPros = Provider::with(['user', 'category'])
                 ->where('verification_status', 'verified')
                 ->where('is_active', true)
                 ->orderByDesc('skill_score')

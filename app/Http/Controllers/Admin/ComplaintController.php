@@ -10,8 +10,10 @@ class ComplaintController extends Controller {
         return view('admin.complaints', compact('complaints'));
     }
     public function resolve(Complaint $complaint, Request $request) {
-        $request->validate(['resolution' => 'required|string|min:5']);
-        $complaint->update(['status' => 'resolved', 'resolution' => $request->resolution]);
+        $resolution = $request->input('resolution') ?: $request->input('resolution_notes');
+        $request->merge(['resolution' => $resolution]);
+        $request->validate(['resolution' => 'required|string|min:5|max:2000']);
+        $complaint->update(['status' => 'resolved', 'resolution' => $resolution]);
         return back()->with('success', 'Complaint resolved.');
     }
 }

@@ -6,7 +6,6 @@ use App\Models\SplitBooking;
 use App\Models\SplitBookingItem;
 use App\Models\Provider;
 use App\Models\ServiceCategory;
-use App\Services\SkillScoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -28,11 +27,13 @@ class BookingController extends Controller {
     }
     public function store(Request $request) {
         $request->validate([
-            'provider_id' => 'required|exists:providers,id',
-            'booking_date' => 'required|date|after_or_equal:today',
-            'booking_time' => 'required',
-            'address' => 'required|string',
-            'city' => 'required|in:Ahmedabad,Gandhinagar',
+            'provider_id'    => 'required|exists:providers,id',
+            'booking_date'   => 'required|date|after_or_equal:today',
+            'booking_time'   => 'required|string|max:20',
+            'address'        => 'required|string|max:255',
+            'city'           => 'required|in:Ahmedabad,Gandhinagar',
+            'description'    => 'nullable|string|max:1000',
+            'payment_method' => 'nullable|in:cash,card,wallet',
         ]);
         $provider = Provider::where('verification_status', 'verified')->where('is_active', true)->findOrFail($request->provider_id);
         $booking = Booking::create([
@@ -60,34 +61,51 @@ class BookingController extends Controller {
     }
     public function storeSplitBooking(Request $request) {
         $request->validate([
-            'booking_date' => 'required|date|after_or_equal:today',
-            'address'      => 'required|string',
-            'city'         => 'required|in:Ahmedabad,Gandhinagar',
-            'services'     => 'required|array|min:1',
+            'booking_date'           => 'required|date|after_or_equal:today',
+            'address'                => 'required|string|max:255',
+            'city'                   => 'required|in:Ahmedabad,Gandhinagar',
+            'payment_method'         => 'nullable|in:cash,card,wallet',
+            'services'               => 'required|array|min:1',
             'services.*.provider_id' => 'required|exists:providers,id',
-            'services.*.time'        => 'required',
-            'services.*.amount'      => 'required|numeric|min:0',
+            'services.*.time'        => 'required|string|max:20',
+            'services.*.amount'      => 'nullable|numeric|min:0',
         ]);
         DB::transaction(function() use ($request) {
+            // First resolve all providers and calculate authoritative total amount
+            $resolvedServices = [];
+            $totalAmount = 0;
+            foreach ($request->services as $service) {
+                $provider = Provider::where('verification_status', 'verified')->where('is_active', true)->findOrFail($service['provider_id']);
+                $rate = (float) $provider->hourly_rate;
+                $totalAmount += $rate;
+                $resolvedServices[] = [
+                    'provider' => $provider,
+                    'time'     => $service['time'],
+                    'amount'   => $rate,
+                ];
+            }
+
             $split = SplitBooking::create([
                 'split_code'     => SplitBooking::generateCode(),
                 'customer_id'    => Auth::id(),
                 'booking_date'   => $request->booking_date,
                 'address'        => $request->address,
                 'city'           => $request->city,
-                'total_amount'   => collect($request->services)->sum('amount'),
+                'total_amount'   => $totalAmount,
                 'payment_method' => $request->payment_method ?? 'cash',
                 'status'         => 'pending',
             ]);
-            foreach ($request->services as $i => $service) {
-                $provider = Provider::where('verification_status', 'verified')->where('is_active', true)->findOrFail($service['provider_id']);
-                
+
+            foreach ($resolvedServices as $item) {
+                $provider = $item['provider'];
+                $rate = $item['amount'];
+
                 SplitBookingItem::create([
                     'split_booking_id' => $split->id,
                     'provider_id'      => $provider->id,
                     'category_id'      => $provider->category_id,
-                    'scheduled_time'   => $service['time'],
-                    'amount'           => $service['amount'],
+                    'scheduled_time'   => $item['time'],
+                    'amount'           => $rate,
                     'status'           => 'pending',
                 ]);
 
@@ -97,12 +115,12 @@ class BookingController extends Controller {
                     'provider_id'      => $provider->id,
                     'category_id'      => $provider->category_id,
                     'booking_date'     => $request->booking_date,
-                    'booking_time'     => $service['time'],
+                    'booking_time'     => $item['time'],
                     'address'          => $request->address,
                     'city'             => $request->city,
                     'description'      => 'Split Booking #' . $split->split_code,
-                    'service_charge'   => $service['amount'],
-                    'total_amount'     => $service['amount'],
+                    'service_charge'   => $rate,
+                    'total_amount'     => $rate,
                     'payment_method'   => $request->payment_method ?? 'cash',
                     'payment_status'   => 'pending',
                     'status'           => 'pending',
@@ -118,6 +136,7 @@ class BookingController extends Controller {
     public function cancel(Booking $booking) {
         abort_if($booking->customer_id !== Auth::id(), 403);
         abort_if(!in_array($booking->status, ['pending','accepted']), 422, 'Cannot cancel this booking.');
+        request()->validate(['reason' => 'nullable|string|max:500']);
         $booking->update(['status' => 'cancelled', 'cancellation_reason' => request('reason')]);
         $provider = $booking->provider;
         if ($provider && $provider->total_jobs > 0) {

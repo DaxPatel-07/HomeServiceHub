@@ -36,9 +36,9 @@
           <div class="ai-avatar" style="flex-shrink:0;">🤖</div>
           <div style="flex:1;">
             <div style="color:#fff;font-weight:700;">AI Assistant</div>
-            <div style="color:rgba(255,255,255,.5);font-size:.75rem;">Gemini-Powered Home Service Expert</div>
+            <div style="color:rgba(255,255,255,.85);font-size:.75rem;">Gemini-Powered Home Service Expert</div>
           </div>
-          <button onclick="clearChat()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:.4rem .8rem;color:rgba(255,255,255,.6);cursor:pointer;font-size:.78rem;"><i class="fas fa-trash me-1"></i>Clear</button>
+          <button onclick="clearChat()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:.4rem .8rem;color:#fff;cursor:pointer;font-size:.78rem;font-weight:600;"><i class="fas fa-trash me-1"></i>Clear</button>
         </div>
 
         <div class="ai-chat-messages" id="chatMessages">
@@ -61,7 +61,7 @@
             ];
           @endphp
           @foreach($quickSuggestions as $chip)
-          <button type="button" onclick="sendSuggestion('{{ addslashes($chip[1]) }}')" class="btn btn-sm" style="background:#fff; border:1px solid var(--card-border); border-radius:20px; font-size:.76rem; font-weight:600; color:var(--text-secondary); padding:.25rem .75rem; flex-shrink:0; transition:.2s;" onmouseover="this.style.borderColor='var(--brand-blue)'; this.style.color='var(--brand-blue)';" onmouseout="this.style.borderColor='var(--card-border)'; this.style.color='var(--text-secondary)';">
+          <button type="button" onclick="sendSuggestion('{{ addslashes($chip[1]) }}')" class="btn btn-sm" style="background:#fff; border:1.5px solid var(--card-border); border-radius:20px; font-size:.76rem; font-weight:700; color:var(--color-text-dark); padding:.28rem .85rem; flex-shrink:0; transition:.2s;" onmouseover="this.style.borderColor='var(--color-primary)'; this.style.color='var(--color-primary)';" onmouseout="this.style.borderColor='var(--card-border)'; this.style.color='var(--color-text-dark)';">
             <i class="fas fa-sparkles me-1" style="color:var(--gold);"></i>{{ $chip[0] }}
           </button>
           @endforeach

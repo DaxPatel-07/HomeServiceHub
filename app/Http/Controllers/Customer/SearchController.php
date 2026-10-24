@@ -50,7 +50,7 @@ class SearchController extends Controller {
         }
 
         $canPreview = auth()->user()->isAdminOrMaster() || auth()->id() === $provider->user_id;
-        if ($provider->verification_status !== 'verified' && !$canPreview) {
+        if (($provider->verification_status !== 'verified' || !$provider->is_active) && !$canPreview) {
             abort(404, 'Provider profile not found or pending verification.');
         }
 

@@ -16,8 +16,12 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\ProviderController as AdminProvider;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ComplaintController;
+use App\Http\Controllers\Admin\BookingController as AdminBooking;
+use App\Http\Controllers\Admin\CustomerController as AdminCustomer;
 use App\Http\Controllers\MasterAdmin\DashboardController as MasterDashboard;
 use App\Http\Controllers\MasterAdmin\AdminController;
+use App\Http\Controllers\MasterAdmin\ReportController;
+use App\Http\Controllers\MasterAdmin\SettingsController;
 use App\Http\Controllers\AI\ChatController;
 
 // Public routes
@@ -27,18 +31,18 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 // Auth routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login.post');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register')->name('register.post');
     Route::get('/become-a-provider', [AuthController::class, 'showBecomeProvider'])->name('become-provider');
-    Route::post('/become-a-provider', [AuthController::class, 'register'])->name('become-provider.post');
+    Route::post('/become-a-provider', [AuthController::class, 'register'])->middleware('throttle:register')->name('become-provider.post');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // AI Assistant
 Route::get('/ai-assistant', [ChatController::class, 'index'])->name('ai.assistant');
-Route::post('/ai/chat', [ChatController::class, 'chat'])->name('ai.chat');
-Route::post('/ai/suggest-service', [ChatController::class, 'suggestService'])->name('ai.suggest');
+Route::post('/ai/chat', [ChatController::class, 'chat'])->middleware('throttle:ai-chat')->name('ai.chat');
+Route::post('/ai/suggest-service', [ChatController::class, 'suggestService'])->middleware('throttle:ai-chat')->name('ai.suggest');
 
 // Customer routes
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer.')->group(function () {
@@ -59,7 +63,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     // Profile
     Route::get('/profile', [CustomerProfile::class, 'index'])->name('profile');
     Route::put('/profile', [CustomerProfile::class, 'update'])->name('profile.update');
-    Route::put('/password', [CustomerProfile::class, 'updatePassword'])->name('password.update');
+    Route::put('/password', [CustomerProfile::class, 'updatePassword'])->middleware('throttle:6,1')->name('password.update');
     // Complaints
     Route::get('/complaint/{booking}', [CustomerComplaint::class, 'create'])->name('complaint.create');
     Route::post('/complaint/{booking}', [CustomerComplaint::class, 'store'])->name('complaint.store');
@@ -91,8 +95,8 @@ Route::middleware(['auth', 'role:admin,master_admin'])->prefix('admin')->name('a
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/complaints', [ComplaintController::class, 'index'])->name('complaints');
     Route::post('/complaints/{complaint}/resolve', [ComplaintController::class, 'resolve'])->name('complaints.resolve');
-    Route::get('/bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings');
-    Route::get('/customers', [\App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers');
+    Route::get('/bookings', [AdminBooking::class, 'index'])->name('bookings');
+    Route::get('/customers', [AdminCustomer::class, 'index'])->name('customers');
 });
 
 // Master Admin routes
@@ -101,6 +105,6 @@ Route::middleware(['auth', 'role:master_admin'])->prefix('master-admin')->name('
     Route::get('/admins', [AdminController::class, 'index'])->name('admins');
     Route::post('/admins', [AdminController::class, 'store'])->name('admins.store');
     Route::delete('/admins/{user}', [AdminController::class, 'destroy'])->name('admins.destroy');
-    Route::get('/reports', [\App\Http\Controllers\MasterAdmin\ReportController::class, 'index'])->name('reports');
-    Route::get('/settings', [\App\Http\Controllers\MasterAdmin\SettingsController::class, 'index'])->name('settings');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 });

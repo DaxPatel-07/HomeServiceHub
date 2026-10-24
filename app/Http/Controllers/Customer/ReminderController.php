@@ -13,8 +13,40 @@ class ReminderController extends Controller {
         return view('customer.reminders', compact('reminders','categories'));
     }
     public function store(Request $request) {
-        $request->validate(['title'=>'required','category_id'=>'required|exists:service_categories,id','next_due_date'=>'required|date','repeat_months'=>'required|integer|min:1']);
-        MaintenanceReminder::create(array_merge($request->only('title','category_id','next_due_date','repeat_months','notes'), ['customer_id' => Auth::id()]));
+        $title = $request->input('title') ?: $request->input('service_type');
+        $nextDueDate = $request->input('next_due_date') ?: $request->input('due_date');
+        $categoryId = $request->input('category_id');
+
+        if (!$categoryId && $request->filled('service_type')) {
+            $cat = ServiceCategory::where('name', 'like', '%'.$request->input('service_type').'%')->first() 
+                ?? ServiceCategory::first();
+            $categoryId = $cat?->id;
+        }
+
+        $request->merge([
+            'title' => $title,
+            'next_due_date' => $nextDueDate,
+            'category_id' => $categoryId,
+            'repeat_months' => $request->input('repeat_months', 6),
+        ]);
+
+        $request->validate([
+            'title' => 'required|string|max:150',
+            'category_id' => 'required|exists:service_categories,id',
+            'next_due_date' => 'required|date',
+            'repeat_months' => 'required|integer|min:1|max:120',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        MaintenanceReminder::create([
+            'customer_id'   => Auth::id(),
+            'title'         => $request->title,
+            'category_id'   => $request->category_id,
+            'next_due_date' => $request->next_due_date,
+            'repeat_months' => $request->repeat_months,
+            'notes'         => $request->notes,
+        ]);
+
         return back()->with('success', 'Reminder set!');
     }
     public function destroy(MaintenanceReminder $reminder) {

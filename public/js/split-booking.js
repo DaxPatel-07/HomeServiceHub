@@ -15,10 +15,10 @@ function addServiceRow() {
       <span style="font-weight:600;">Service ${rowCount}</span>
     </div>
     <div class="row g-2">
-      <div class="col-md-5"><select name="services[${rowCount-1}][provider_id]" class="form-control provider-select" onchange="updateAmount(this)" required>${providersOptions}</select></div>
-      <div class="col-md-3"><input type="time" name="services[${rowCount-1}][time]" class="form-control" value="${timeDefault}" required></div>
-      <div class="col-md-3"><input type="number" name="services[${rowCount-1}][amount]" class="form-control amount-input" placeholder="₹ Amount" required></div>
-      <div class="col-md-1 d-flex align-items-center"><button type="button" onclick="removeRow(this)" style="background:rgba(239,68,68,.1);border:none;border-radius:8px;padding:.35rem .5rem;color:var(--danger);cursor:pointer;"><i class="fas fa-times"></i></button></div>
+      <div class="col-12 col-md-5"><select name="services[${rowCount-1}][provider_id]" class="form-control provider-select" onchange="updateAmount(this)" required>${providersOptions}</select></div>
+      <div class="col-6 col-md-3"><input type="time" name="services[${rowCount-1}][time]" class="form-control" value="${timeDefault}" required></div>
+      <div class="col-4 col-md-3"><input type="number" name="services[${rowCount-1}][amount]" class="form-control amount-input" placeholder="₹ Amount" required></div>
+      <div class="col-2 col-md-1 d-flex align-items-center justify-content-center"><button type="button" onclick="removeRow(this)" style="background:rgba(239,68,68,.1);border:none;border-radius:8px;padding:.45rem .6rem;color:var(--danger);cursor:pointer;" title="Remove service"><i class="fas fa-times"></i></button></div>
     </div>`;
   container.appendChild(row);
   updateSummary();

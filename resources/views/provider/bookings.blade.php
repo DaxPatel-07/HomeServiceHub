@@ -49,7 +49,7 @@
               </td>
               <td>
                 <div class="d-flex align-items-center gap-2">
-                  <div class="avatar-sm" style="background:var(--brand-cream);color:var(--brand-deep-blue);font-weight:800;border:1px solid var(--brand-beige);">
+                  <div class="avatar-sm" style="background:linear-gradient(135deg, var(--color-primary), var(--color-support-blue));color:#ffffff;font-weight:800;">
                     {{ strtoupper(substr($b->customer->name,0,1)) }}
                   </div>
                   <div>

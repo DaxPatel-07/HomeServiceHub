@@ -5,23 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') - HomeServiceHub</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/homeservicehub-icon.svg') }}">
+    <link rel="alternate icon" type="image/png" href="{{ asset('images/homeservicehub-icon.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     @stack('styles')
 </head>
 <body>
-<div class="d-flex">
+<a href="#mainContent" class="skip-to-content">Skip to main content</a>
+<div class="d-flex app-layout-wrapper">
     <!-- Sidebar -->
     <aside class="app-sidebar" id="appSidebar">
         <div class="sidebar-brand">
-            <a href="{{ route('home') }}" style="text-decoration:none;">
-                <div class="brand-name"><i class="fas fa-tools me-2" style="color:var(--brand-blue)"></i>Home<span style="color:var(--brand-blue)">Service</span>Hub</div>
-                <div class="brand-sub">@yield('role-label', 'Dashboard')</div>
+            <a href="{{ route('home') }}" class="d-flex align-items-center gap-2" style="text-decoration:none;" title="HomeServiceHub">
+                <img src="{{ asset('images/logo-mark.svg') }}" alt="HomeServiceHub" width="34" height="34" class="brand-logo-img" style="flex-shrink:0;object-fit:contain;">
+                <div>
+                    <div class="brand-name" style="font-family:'Poppins',sans-serif;font-weight:800;line-height:1.1;color:var(--color-text-dark, #14213D);">HomeService<span style="color:var(--color-primary)">Hub</span></div>
+                    <div class="brand-sub">@yield('role-label', 'Dashboard')</div>
+                </div>
             </a>
         </div>
         <div class="sidebar-user">
-            <div class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+            <div class="avatar" style="background:var(--color-primary);">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
             <div class="user-info">
                 <div class="name">{{ auth()->user()->name }}</div>
                 <div class="role">{{ ucfirst(str_replace('_',' ', auth()->user()->role)) }}</div>
@@ -34,18 +43,17 @@
             <div class="plant-icon">🪴</div>
             <div class="plant-quote">Better Services<br>Happier Homes ♡</div>
         </div>
+        @hasSection('sidebar-footer')
         <div class="sidebar-footer">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
-            </form>
+            @yield('sidebar-footer')
         </div>
+        @endif
     </aside>
 
     <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()" aria-hidden="true"></div>
 
     <!-- Main Content -->
-    <main class="app-content">
+    <main class="app-content" id="mainContent">
         <div class="app-topbar">
             <div class="d-flex align-items-center gap-3">
                 <button class="btn btn-sm" id="sidebarToggle" type="button" aria-label="Toggle navigation menu" aria-controls="appSidebar" aria-expanded="false" onclick="toggleSidebar(event)" style="background:var(--bg-light);border:1px solid var(--card-border);border-radius:8px;padding:.4rem .7rem;">
@@ -63,26 +71,36 @@
 
             <div class="topbar-right d-flex align-items-center gap-2">
                 @if(auth()->check() && auth()->user()->role === 'customer')
-                <button type="button" class="btn btn-sm d-none d-md-inline-flex align-items-center" onclick="toggleFloatingChat()" style="background:rgba(37,99,235,.08);color:var(--brand-blue);border:1px solid rgba(37,99,235,.2);border-radius:20px;padding:.38rem .95rem;font-weight:600;font-size:.82rem;cursor:pointer;">
+                <button type="button" class="btn btn-sm d-none d-md-inline-flex align-items-center" onclick="toggleFloatingChat()" style="background:var(--color-blue-tint);color:var(--color-primary);border:1px solid rgba(36,81,189,.2);border-radius:20px;padding:.38rem .95rem;font-weight:600;font-size:.82rem;cursor:pointer;">
                     <i class="fas fa-robot me-1"></i>AI Assistant
                 </button>
                 <a href="{{ route('customer.reminders') }}" class="topbar-notif-btn" title="Maintenance Reminders">
                     <i class="fas fa-bell"></i>
                     <span class="topbar-notif-badge"></span>
                 </a>
+                @elseif(auth()->check() && auth()->user()->role === 'provider')
+                <a href="{{ route('provider.bookings') }}" class="topbar-notif-btn" title="Provider Bookings">
+                    <i class="fas fa-bell"></i>
+                    @php
+                        $pendingCount = auth()->user()->provider ? auth()->user()->provider->bookings()->where('status', 'pending')->count() : 0;
+                    @endphp
+                    @if($pendingCount > 0)
+                        <span class="topbar-notif-badge" style="background:#EF4444;"></span>
+                    @endif
+                </a>
                 @endif
 
                 {{-- User Profile Menu Dropdown --}}
                 <div class="dropdown">
-                    <button class="btn d-flex align-items-center gap-2 dropdown-toggle" type="button" id="topbarUserDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background:var(--brand-cream);border:1px solid var(--card-border);border-radius:20px;padding:.32rem .85rem;font-size:.85rem;font-weight:700;color:var(--brand-deep-blue);box-shadow:none;">
-                        <div class="avatar-sm" style="background:var(--brand-blue);color:#fff;width:28px;height:28px;font-size:.8rem;">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                    <button class="btn d-flex align-items-center gap-2 dropdown-toggle" type="button" id="topbarUserDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background:#FFFFFF;border:1px solid var(--color-border);border-radius:20px;padding:.32rem .85rem;font-size:.85rem;font-weight:700;color:var(--color-text);box-shadow:none;">
+                        <div class="avatar-sm" style="background:var(--color-primary);color:#fff;width:28px;height:28px;font-size:.8rem;border-radius:50%;display:flex;align-items:center;justify-content:center;">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
                         <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="topbarUserDropdown" style="border-radius:12px;border:1px solid var(--card-border);min-width:210px;margin-top:.5rem;padding:.5rem 0;">
-                        <li class="px-3 py-2 border-bottom" style="background:var(--bg-light);">
-                            <div style="font-weight:700;font-size:.85rem;color:var(--brand-deep-blue);">{{ auth()->user()->name }}</div>
-                            <div style="font-size:.72rem;color:var(--text-muted);word-break:break-all;">{{ auth()->user()->email }}</div>
-                            <span class="badge mt-1" style="background:rgba(37,99,235,.1);color:var(--brand-blue);font-size:.65rem;font-weight:700;text-transform:uppercase;">
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="topbarUserDropdown" style="border-radius:12px;border:1px solid var(--color-border);min-width:210px;margin-top:.5rem;padding:.5rem 0;">
+                        <li class="px-3 py-2 border-bottom" style="background:var(--color-background);">
+                            <div style="font-weight:700;font-size:.85rem;color:var(--color-text);">{{ auth()->user()->name }}</div>
+                            <div style="font-size:.72rem;color:var(--color-muted);word-break:break-all;">{{ auth()->user()->email }}</div>
+                            <span class="badge mt-1" style="background:var(--color-blue-tint);color:var(--color-primary);font-size:.65rem;font-weight:700;text-transform:uppercase;">
                                 {{ ucfirst(str_replace('_',' ', auth()->user()->role)) }}
                             </span>
                         </li>
@@ -97,7 +115,18 @@
                                 <i class="fas fa-calendar-check me-2 text-primary"></i>My Bookings
                             </a>
                         </li>
+                        @elseif(auth()->check() && auth()->user()->role === 'provider')
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ route('provider.bookings') }}" style="font-size:.85rem;font-weight:600;color:var(--brand-deep-blue);">
+                                <i class="fas fa-calendar-check me-2 text-primary"></i>Manage Bookings
+                            </a>
+                        </li>
                         @endif
+                        <li>
+                            <a class="dropdown-item py-2" href="{{ route('home') }}" style="font-size:.85rem;font-weight:600;color:var(--brand-deep-blue);">
+                                <i class="fas fa-home me-2 text-primary"></i>Home
+                            </a>
+                        </li>
                         <li><hr class="dropdown-divider my-1"></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}" class="m-0">
@@ -109,6 +138,12 @@
                         </li>
                     </ul>
                 </div>
+
+                {{-- Direct Topbar Home Button --}}
+                <a href="{{ route('home') }}" class="topbar-home-btn" title="Go to HomeServiceHub Homepage" aria-label="Home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
 
                 {{-- Direct Topbar Logout Button --}}
                 <form method="POST" action="{{ route('logout') }}" class="m-0">
@@ -129,6 +164,11 @@
         @if(session('error'))
             <div class="mx-4 mt-4">
                 <div class="alert-custom alert-error-custom"><i class="fas fa-exclamation-circle"></i> {{ session('error') }}</div>
+            </div>
+        @endif
+        @if(session('info'))
+            <div class="mx-4 mt-4">
+                <div class="alert-custom alert-info-custom" style="background:rgba(37,99,235,.08);color:var(--color-primary);border:1px solid rgba(37,99,235,.2);"><i class="fas fa-info-circle"></i> {{ session('info') }}</div>
             </div>
         @endif
 

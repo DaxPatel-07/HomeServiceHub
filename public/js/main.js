@@ -8,9 +8,9 @@ function initCounters() {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const el = entry.target;
-        const target = parseInt(el.dataset.count);
+        const target = parseInt(el.dataset.count, 10) || 0;
         let count = 0;
-        const step = Math.ceil(target / 60);
+        const step = Math.max(1, Math.ceil(target / 60));
         const timer = setInterval(() => {
           count = Math.min(count + step, target);
           el.textContent = count.toLocaleString() + '+';
@@ -21,6 +21,26 @@ function initCounters() {
     });
   });
   counters.forEach(el => observer.observe(el));
+}
+
+// Form submit loading state and double-submit prevention
+function initFormSubmitStates() {
+  document.addEventListener('submit', (e) => {
+    const form = e.target;
+    if (form.dataset.submitting === 'true') {
+      e.preventDefault();
+      return;
+    }
+    const submitBtn = form.querySelector('button[type="submit"]:not([data-no-loading])');
+    if (submitBtn) {
+      form.dataset.submitting = 'true';
+      submitBtn.classList.add('btn-submitting');
+      const spinner = document.createElement('span');
+      spinner.className = 'btn-spinner';
+      spinner.setAttribute('aria-hidden', 'true');
+      submitBtn.prepend(spinner);
+    }
+  });
 }
 
 // Add staggered animation to cards
@@ -53,4 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initCounters();
   initAnimations();
   initAlerts();
+  initFormSubmitStates();
 });
+

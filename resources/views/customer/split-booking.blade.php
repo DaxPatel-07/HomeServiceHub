@@ -13,14 +13,6 @@
 <div class="nav-item"><a href="javascript:void(0)" onclick="toggleFloatingChat()"><i class="fas fa-robot"></i>AI Assistant</a></div>
 <div class="nav-section-title">Account</div>
 <div class="nav-item"><a href="{{ route('customer.profile') }}"><i class="fas fa-user-circle"></i>My Profile</a></div>
-<div class="nav-item">
-  <form method="POST" action="{{ route('logout') }}" id="sidebarCustomerNavLogoutForm" style="display:none;">
-    @csrf
-  </form>
-  <a href="javascript:void(0)" onclick="document.getElementById('sidebarCustomerNavLogoutForm').submit();" style="color:#EF4444;font-weight:600;">
-    <i class="fas fa-sign-out-alt" style="color:#EF4444;"></i>Logout
-  </a>
-</div>
 @endsection
 @section('content')
 <div class="row g-4">
@@ -47,8 +39,8 @@
             <input type="date" name="booking_date" class="form-control" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
           </div>
           <div class="row g-3">
-            <div class="col-6"><div class="form-group-custom"><label>Service Address</label><input type="text" name="address" class="form-control" placeholder="Full address" required></div></div>
-            <div class="col-6"><div class="form-group-custom"><label>City</label>
+            <div class="col-12 col-md-6"><div class="form-group-custom"><label>Service Address</label><input type="text" name="address" class="form-control" placeholder="Full address" required></div></div>
+            <div class="col-12 col-md-6"><div class="form-group-custom"><label>City</label>
               <select name="city" class="form-control" required>
                 <option value="Ahmedabad" {{ (auth()->user()->city ?? '')=='Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
                 <option value="Gandhinagar" {{ (auth()->user()->city ?? '')=='Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
@@ -66,7 +58,7 @@
                 <span style="font-weight:600;">Service 1</span>
               </div>
               <div class="row g-2">
-                <div class="col-md-5">
+                <div class="col-12 col-md-5">
                   <select name="services[0][provider_id]" class="form-control provider-select" onchange="updateAmount(this)" required>
                     <option value="">Select Provider</option>
                     @foreach($providers as $p)
@@ -74,9 +66,9 @@
                     @endforeach
                   </select>
                 </div>
-                <div class="col-md-3"><input type="time" name="services[0][time]" class="form-control" value="09:00" required></div>
-                <div class="col-md-3"><input type="number" name="services[0][amount]" class="form-control amount-input" placeholder="₹ Amount" required></div>
-                <div class="col-md-1 d-flex align-items-center"><button type="button" onclick="removeRow(this)" style="background:rgba(239,68,68,.1);border:none;border-radius:8px;padding:.35rem .5rem;color:var(--danger);cursor:pointer;"><i class="fas fa-times"></i></button></div>
+                <div class="col-6 col-md-3"><input type="time" name="services[0][time]" class="form-control" value="09:00" required></div>
+                <div class="col-4 col-md-3"><input type="number" name="services[0][amount]" class="form-control amount-input" placeholder="₹ Amount" required></div>
+                <div class="col-2 col-md-1 d-flex align-items-center justify-content-center"><button type="button" onclick="removeRow(this)" style="background:rgba(239,68,68,.1);border:none;border-radius:8px;padding:.45rem .6rem;color:var(--danger);cursor:pointer;" title="Remove service"><i class="fas fa-times"></i></button></div>
               </div>
             </div>
           </div>

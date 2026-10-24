@@ -18,6 +18,7 @@ class BookingController extends Controller {
     }
     public function accept(Booking $booking) {
         $provider = $this->getProvider();
+        abort_if(!$provider->is_active || $provider->verification_status !== 'verified', 403, 'Your provider account is not active or verified.');
         abort_if($booking->provider_id !== $provider->id, 403);
         abort_if($booking->status !== 'pending', 422, 'Only pending bookings can be accepted.');
         $booking->update(['status' => 'accepted']);
@@ -25,8 +26,10 @@ class BookingController extends Controller {
     }
     public function reject(Booking $booking, Request $request) {
         $provider = $this->getProvider();
+        abort_if(!$provider->is_active || $provider->verification_status !== 'verified', 403, 'Your provider account is not active or verified.');
         abort_if($booking->provider_id !== $provider->id, 403);
         abort_if(!in_array($booking->status, ['pending', 'accepted']), 422, 'This booking cannot be rejected.');
+        $request->validate(['reason' => 'nullable|string|max:500']);
         $booking->update(['status' => 'cancelled', 'cancellation_reason' => $request->reason]);
         if ($provider->total_jobs > 0) {
             $provider->decrement('total_jobs');
@@ -35,6 +38,7 @@ class BookingController extends Controller {
     }
     public function complete(Booking $booking) {
         $provider = $this->getProvider();
+        abort_if(!$provider->is_active || $provider->verification_status !== 'verified', 403, 'Your provider account is not active or verified.');
         abort_if($booking->provider_id !== $provider->id, 403);
         abort_if($booking->status !== 'accepted', 422, 'Only accepted bookings can be marked complete.');
         $booking->update(['status' => 'completed', 'payment_status' => 'paid']);

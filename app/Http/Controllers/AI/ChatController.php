@@ -12,7 +12,12 @@ class ChatController extends Controller {
         return view('ai.assistant');
     }
     public function chat(Request $request) {
-        $request->validate(['message' => 'required|string|max:1000']);
+        $request->validate([
+            'message'        => 'required|string|max:1000',
+            'history'        => 'nullable|array|max:20',
+            'history.*.role' => 'nullable|string|max:20',
+            'history.*.text' => 'nullable|string|max:2000',
+        ]);
         $history = $request->history ?? [];
         $user = auth()->user();
         $customer = ($user && $user->role === 'customer') ? $user : null;

@@ -9,14 +9,6 @@
 <div class="nav-item"><a href="{{ route('customer.bookings') }}"><i class="fas fa-calendar-check"></i>My Bookings</a></div>
 <div class="nav-section-title">Account</div>
 <div class="nav-item"><a href="{{ route('customer.profile') }}"><i class="fas fa-user-circle"></i>My Profile</a></div>
-<div class="nav-item">
-  <form method="POST" action="{{ route('logout') }}" id="sidebarCustomerNavLogoutForm" style="display:none;">
-    @csrf
-  </form>
-  <a href="javascript:void(0)" onclick="document.getElementById('sidebarCustomerNavLogoutForm').submit();" style="color:#EF4444;font-weight:600;">
-    <i class="fas fa-sign-out-alt" style="color:#EF4444;"></i>Logout
-  </a>
-</div>
 @endsection
 @section('content')
 <div class="row g-4">
@@ -58,7 +50,7 @@
           <div style="font-weight:700;font-size:.88rem;color:var(--brand-deep-blue);margin-bottom:.75rem;">Rate Specific Aspects</div>
           <div class="row g-3">
             @foreach(['Service Quality', 'Professionalism', 'Punctuality', 'Value for Money'] as $aspect)
-            <div class="col-6">
+            <div class="col-12 col-sm-6">
               <div style="background:var(--brand-cream);border:1px solid var(--card-border);border-radius:10px;padding:.65rem .85rem;">
                 <div style="font-size:.78rem;font-weight:700;color:var(--brand-deep-blue);margin-bottom:.25rem;">{{ $aspect }}</div>
                 <div class="d-flex gap-1" style="color:var(--gold);font-size:.8rem;">

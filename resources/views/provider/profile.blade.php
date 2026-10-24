@@ -126,7 +126,7 @@
 
   <div class="col-lg-4">
     <div class="card-custom p-4 text-center">
-      <div class="provider-avatar mx-auto mb-3" style="width:84px;height:84px;font-size:2.2rem;background:var(--brand-cream);color:var(--brand-deep-blue);border:2px solid var(--brand-beige);">
+      <div class="provider-avatar mx-auto mb-3" style="width:84px;height:84px;font-size:2.2rem;background:linear-gradient(135deg, var(--color-primary), var(--color-support-blue));color:#ffffff;border:3px solid var(--color-blue-tint);box-shadow:0 6px 18px rgba(36,81,189,0.2);">
         {{ strtoupper(substr($provider->name,0,1)) }}
       </div>
       <h5 style="font-weight:900;color:var(--brand-deep-blue);margin-bottom:.2rem;">{{ $provider->name }}</h5>

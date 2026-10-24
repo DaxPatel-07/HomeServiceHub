@@ -9,9 +9,30 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller {
+    private function isSafeRedirect(?string $url): bool {
+        if (empty($url)) {
+            return false;
+        }
+        if (str_contains($url, "\r") || str_contains($url, "\n")) {
+            return false;
+        }
+        // Local relative paths starting with / but not protocol-relative // or /\
+        if (str_starts_with($url, '/') && !str_starts_with($url, '//') && !str_starts_with($url, '/\\')) {
+            return true;
+        }
+        $parsed = parse_url($url);
+        if ($parsed && isset($parsed['host']) && $parsed['host'] === request()->getHost()) {
+            return true;
+        }
+        return false;
+    }
+
     public function showLogin(Request $request) {
         if ($request->filled('redirect')) {
-            session()->put('url.intended', $request->query('redirect'));
+            $redirect = $request->query('redirect');
+            if ($this->isSafeRedirect($redirect)) {
+                session()->put('url.intended', $redirect);
+            }
         }
         return view('auth.login');
     }
@@ -20,11 +41,28 @@ class AuthController extends Controller {
         $request->validate(['email' => 'required|email', 'password' => 'required']);
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
             $user = Auth::user();
 
-            if ($request->filled('redirect') && !str_contains($request->input('redirect'), 'login')) {
-                return redirect()->to($request->input('redirect'));
+            if (!$user->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withErrors(['email' => 'Your account has been deactivated. Please contact support.'])->withInput();
+            }
+
+            $request->session()->regenerate();
+
+            if ($request->filled('redirect')) {
+                $redirect = $request->input('redirect');
+                if ($this->isSafeRedirect($redirect) && !str_contains($redirect, 'login')) {
+                    return redirect()->to($redirect);
+                }
+                session()->forget('url.intended');
+            }
+
+            $intended = session()->get('url.intended');
+            if ($intended && (!$this->isSafeRedirect($intended) || $intended === url('/') || $intended === route('home'))) {
+                session()->forget('url.intended');
             }
 
             return match($user->role) {
@@ -38,30 +76,38 @@ class AuthController extends Controller {
         return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
     }
 
-    public function showRegister() {
+    public function showRegister(Request $request) {
         $categories = ServiceCategory::where('is_active', true)->get();
-        return view('auth.register', compact('categories'));
+        $initialRole = $request->query('role', 'customer');
+        if (!in_array($initialRole, ['customer', 'provider'])) {
+            $initialRole = 'customer';
+        }
+        return view('auth.register', compact('categories', 'initialRole'));
     }
 
-    public function showBecomeProvider() {
+    public function showBecomeProvider(Request $request) {
         $categories = ServiceCategory::where('is_active', true)->get();
-        return view('auth.become-provider', compact('categories'));
+        $initialRole = 'provider';
+        return view('auth.register', compact('categories', 'initialRole'));
     }
 
     public function register(Request $request) {
         $rules = [
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users',
+            'name'     => 'required|string|max:100',
+            'email'    => 'required|email|max:255|unique:users',
             'password' => 'required|min:8|confirmed',
             'role'     => 'required|in:customer,provider',
             'phone'    => 'required|string|max:20',
             'city'     => 'required|in:Ahmedabad,Gandhinagar',
+            'address'  => 'nullable|string|max:255',
         ];
         if ($request->role === 'provider') {
-            $rules['category_id']   = 'required|exists:service_categories,id';
-            $rules['hourly_rate']   = 'required|numeric|min:0';
-            $rules['experience_years'] = 'nullable|numeric|min:0';
-            $rules['service_area']  = 'nullable|string|max:255';
+            $rules['category_id']      = 'required|exists:service_categories,id';
+            $rules['hourly_rate']      = 'required|numeric|min:0|max:100000';
+            $rules['experience_years'] = 'nullable|integer|min:0|max:80';
+            $rules['service_area']     = 'nullable|string|max:255';
+            $rules['business_name']    = 'nullable|string|max:150';
+            $rules['bio']              = 'nullable|string|max:2000';
         }
         $request->validate($rules);
 

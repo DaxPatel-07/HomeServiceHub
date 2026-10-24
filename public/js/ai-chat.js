@@ -11,8 +11,8 @@ function formatMarkdown(text) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Markdown links: [text](url) -> <a href="url" class="chat-link">text</a>
-  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="chat-link" style="color:var(--primary);font-weight:700;text-decoration:underline;">$1</a>');
+  // Markdown links: restrict to safe http, https, or relative paths starting with / (excluding //)
+  formatted = formatted.replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/(?!\/))[^\s"'<>]+)\)/g, '<a href="$2" class="chat-link" style="color:var(--primary);font-weight:700;text-decoration:underline;" rel="noopener noreferrer">$1</a>');
 
   // Bold: **text** -> <strong>text</strong>
   formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');

@@ -13,25 +13,17 @@
 <div class="nav-item"><a href="javascript:void(0)" onclick="toggleFloatingChat()"><i class="fas fa-robot"></i>AI Assistant</a></div>
 <div class="nav-section-title">Account</div>
 <div class="nav-item"><a href="{{ route('customer.profile') }}"><i class="fas fa-user-circle"></i>My Profile</a></div>
-<div class="nav-item">
-  <form method="POST" action="{{ route('logout') }}" id="sidebarCustomerNavLogoutForm" style="display:none;">
-    @csrf
-  </form>
-  <a href="javascript:void(0)" onclick="document.getElementById('sidebarCustomerNavLogoutForm').submit();" style="color:#EF4444;font-weight:600;">
-    <i class="fas fa-sign-out-alt" style="color:#EF4444;"></i>Logout
-  </a>
-</div>
 @endsection
 @section('content')
-<div class="row g-4">
+<div class="row g-3 g-md-4">
   {{-- Welcome Banner --}}
   <div class="col-12">
-    <div class="welcome-banner d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="welcome-banner d-flex justify-content-between align-items-center flex-wrap gap-3" style="box-shadow:var(--shadow-sm);">
       <div>
-        <h4 style="color:#fff;font-weight:800;margin:0;">Good morning, {{ $user->name }}! ☀️</h4>
-        <p style="color:rgba(255,255,255,.75);margin:.25rem 0 0;font-size:.88rem;">Welcome to HomeServiceHub — here's your home maintenance overview.</p>
+        <h4 style="color:#fff;font-weight:700;margin:0;font-family:'Poppins',sans-serif;"><span id="greetingText">Good morning</span>, {{ $user->name }}! <span id="greetingEmoji">☀️</span></h4>
+        <p style="color:rgba(255,255,255,.85);margin:.35rem 0 0;font-size:.9rem;">Welcome to HomeServiceHub — here's your home maintenance overview.</p>
       </div>
-      <a href="{{ route('search') }}" class="btn-gold-custom btn" style="border-radius:20px;padding:.5rem 1.4rem;"><i class="fas fa-plus me-1"></i>Book a Service</a>
+      <a href="{{ route('search') }}" class="btn-banner-cta"><i class="fas fa-plus"></i>Book a Service</a>
     </div>
   </div>
 
@@ -44,19 +36,19 @@
   @endphp
   @if($activeBooking)
   <div class="col-12">
-    <div class="card-custom p-4" style="background:#FFFFFF;border:1px solid var(--card-border);">
+    <div class="card-custom p-3 p-md-4" style="background:#FFFFFF;border:1px solid var(--color-border);border-radius:18px;box-shadow:var(--shadow-sm);">
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
         <div class="d-flex align-items-center gap-3">
-          <div class="avatar-sm" style="background:var(--brand-cream);color:var(--brand-blue);border:1px solid var(--card-border);font-size:1.1rem;width:44px;height:44px;">
+          <div class="avatar-sm" style="background:var(--color-blue-tint);color:var(--color-primary);border:1px solid rgba(36,81,189,0.15);font-size:1.15rem;width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             <i class="{{ $activeBooking->category->icon }}"></i>
           </div>
           <div>
-            <div class="d-flex align-items-center gap-2">
-              <h5 style="font-weight:800;color:var(--brand-deep-blue);margin:0;">Active Booking: {{ $activeBooking->category->name }}</h5>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <h5 style="font-weight:700;color:var(--color-text-dark);margin:0;font-family:'Poppins',sans-serif;">Active Booking: {{ $activeBooking->category->name }}</h5>
               <span class="badge-pill badge-status-{{ $activeBooking->status }}">{{ ucfirst(str_replace('_',' ',$activeBooking->status)) }}</span>
             </div>
-            <div style="font-size:.82rem;color:var(--text-muted);margin-top:.2rem;">
-              Code: <strong>{{ $activeBooking->booking_code }}</strong> &bull; Scheduled for {{ $activeBooking->booking_date->format('d M Y') }} at {{ $activeBooking->formatted_time }}
+            <div style="font-size:.82rem;color:var(--color-text-muted);margin-top:.2rem;">
+              Code: <strong style="color:var(--color-text-dark);">{{ $activeBooking->booking_code }}</strong> &bull; Scheduled for {{ $activeBooking->booking_date->format('d M Y') }} at {{ $activeBooking->formatted_time }}
             </div>
           </div>
         </div>
@@ -66,37 +58,37 @@
       </div>
 
       <!-- 4-Step Stepper -->
-      <div class="d-flex align-items-center justify-content-between mt-3 px-3 py-3" style="background:var(--brand-cream);border-radius:12px;border:1px solid var(--card-border);">
+      <div class="active-booking-stepper mt-3">
         @php
           $isPlaced = true;
           $isAssigned = in_array($activeBooking->status, ['accepted','in_progress','completed']);
           $isInProgress = in_array($activeBooking->status, ['in_progress','completed']);
           $isCompleted = ($activeBooking->status === 'completed');
         @endphp
-        <div class="text-center flex-grow-1 position-relative">
-          <div style="width:34px;height:34px;border-radius:50%;background:{{ $isPlaced ? 'var(--brand-blue)' : '#E2E8F0' }};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;"><i class="fas fa-check"></i></div>
-          <div style="font-size:.75rem;font-weight:700;color:var(--brand-deep-blue);margin-top:.3rem;">Booked</div>
+        <div class="stepper-step">
+          <div class="stepper-circle {{ $isPlaced ? 'active' : 'inactive' }}"><i class="fas fa-check"></i></div>
+          <div class="stepper-label" style="color:var(--color-text-dark);">Booked</div>
         </div>
-        <div style="flex-grow:2;height:2px;background:{{ $isAssigned ? 'var(--brand-blue)' : 'var(--card-border)' }};margin:0 5px 15px;"></div>
-        <div class="text-center flex-grow-1 position-relative">
-          <div style="width:34px;height:34px;border-radius:50%;background:{{ $isAssigned ? 'var(--brand-blue)' : '#E2E8F0' }};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;">
+        <div class="stepper-line {{ $isAssigned ? 'active' : '' }}"></div>
+        <div class="stepper-step">
+          <div class="stepper-circle {{ $isAssigned ? 'active' : 'inactive' }}">
             <i class="fas {{ $isAssigned ? 'fa-check' : 'fa-user' }}"></i>
           </div>
-          <div style="font-size:.75rem;font-weight:700;color:{{ $isAssigned ? 'var(--brand-deep-blue)' : 'var(--text-muted)' }};margin-top:.3rem;">Pro Assigned</div>
+          <div class="stepper-label" style="color:{{ $isAssigned ? 'var(--color-text-dark)' : 'var(--color-text-muted)' }};">Pro Assigned</div>
         </div>
-        <div style="flex-grow:2;height:2px;background:{{ $isInProgress ? 'var(--brand-blue)' : 'var(--card-border)' }};margin:0 5px 15px;"></div>
-        <div class="text-center flex-grow-1 position-relative">
-          <div style="width:34px;height:34px;border-radius:50%;background:{{ $isInProgress ? 'var(--brand-blue)' : '#E2E8F0' }};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;">
+        <div class="stepper-line {{ $isInProgress ? 'active' : '' }}"></div>
+        <div class="stepper-step">
+          <div class="stepper-circle {{ $isInProgress ? 'active' : 'inactive' }}">
             <i class="fas {{ $isInProgress ? 'fa-tools' : 'fa-circle' }}"></i>
           </div>
-          <div style="font-size:.75rem;font-weight:700;color:{{ $isInProgress ? 'var(--brand-deep-blue)' : 'var(--text-muted)' }};margin-top:.3rem;">In Progress</div>
+          <div class="stepper-label" style="color:{{ $isInProgress ? 'var(--color-text-dark)' : 'var(--color-text-muted)' }};">In Progress</div>
         </div>
-        <div style="flex-grow:2;height:2px;background:{{ $isCompleted ? 'var(--success)' : 'var(--card-border)' }};margin:0 5px 15px;"></div>
-        <div class="text-center flex-grow-1 position-relative">
-          <div style="width:34px;height:34px;border-radius:50%;background:{{ $isCompleted ? 'var(--success)' : '#E2E8F0' }};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;">
+        <div class="stepper-line {{ $isCompleted ? 'success' : '' }}"></div>
+        <div class="stepper-step">
+          <div class="stepper-circle {{ $isCompleted ? 'success' : 'inactive' }}">
             <i class="fas fa-flag-checkered"></i>
           </div>
-          <div style="font-size:.75rem;font-weight:700;color:{{ $isCompleted ? 'var(--success)' : 'var(--text-muted)' }};margin-top:.3rem;">Completed</div>
+          <div class="stepper-label" style="color:{{ $isCompleted ? 'var(--color-success)' : 'var(--color-text-muted)' }};">Completed</div>
         </div>
       </div>
     </div>
@@ -105,63 +97,85 @@
 
   {{-- Stats --}}
   <div class="col-6 col-md-3">
-    <div class="stat-card">
+    <div class="dashboard-stat-card">
       <div class="d-flex align-items-center justify-content-between">
-        <div><div class="stat-label">Total Bookings</div><div class="stat-value">{{ $stats['total'] }}</div></div>
-        <div class="stat-icon" style="background:rgba(37,99,235,.1);"><i class="fas fa-calendar" style="color:var(--brand-blue);"></i></div>
+        <div style="min-width:0;flex:1;">
+          <div class="stat-label">Total Bookings</div>
+          <div class="stat-value text-truncate" style="color:var(--color-text-dark);">{{ $stats['total'] }}</div>
+        </div>
+        <div class="stat-icon-wrap ms-2" style="background:var(--color-blue-tint);">
+          <i class="fas fa-calendar" style="color:var(--color-primary);"></i>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-6 col-md-3">
-    <div class="stat-card">
+    <div class="dashboard-stat-card">
       <div class="d-flex align-items-center justify-content-between">
-        <div><div class="stat-label">Pending</div><div class="stat-value">{{ $stats['pending'] }}</div></div>
-        <div class="stat-icon" style="background:rgba(232,165,26,.12);"><i class="fas fa-clock" style="color:var(--gold);"></i></div>
+        <div style="min-width:0;flex:1;">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value text-truncate" style="color:#D97706;">{{ $stats['pending'] }}</div>
+        </div>
+        <div class="stat-icon-wrap ms-2" style="background:rgba(217,119,6,.12);">
+          <i class="fas fa-clock" style="color:#D97706;"></i>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-6 col-md-3">
-    <div class="stat-card">
+    <div class="dashboard-stat-card">
       <div class="d-flex align-items-center justify-content-between">
-        <div><div class="stat-label">Completed</div><div class="stat-value">{{ $stats['completed'] }}</div></div>
-        <div class="stat-icon" style="background:rgba(16,185,129,.1);"><i class="fas fa-check-circle" style="color:var(--success);"></i></div>
+        <div style="min-width:0;flex:1;">
+          <div class="stat-label">Completed</div>
+          <div class="stat-value text-truncate" style="color:var(--color-success);">{{ $stats['completed'] }}</div>
+        </div>
+        <div class="stat-icon-wrap ms-2" style="background:rgba(30,122,79,.12);">
+          <i class="fas fa-check-circle" style="color:var(--color-success);"></i>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-6 col-md-3">
-    <div class="stat-card">
+    <div class="dashboard-stat-card">
       <div class="d-flex align-items-center justify-content-between">
-        <div><div class="stat-label">Total Spent</div><div class="stat-value">₹{{ number_format($stats['spent']) }}</div></div>
-        <div class="stat-icon" style="background:rgba(23,74,139,.1);"><i class="fas fa-wallet" style="color:var(--brand-deep-blue);"></i></div>
+        <div style="min-width:0;flex:1;">
+          <div class="stat-label">Total Spent</div>
+          <div class="stat-value text-truncate" style="color:var(--color-primary);">₹{{ number_format($stats['spent']) }}</div>
+        </div>
+        <div class="stat-icon-wrap ms-2" style="background:var(--color-blue-tint);">
+          <i class="fas fa-wallet" style="color:var(--color-primary);"></i>
+        </div>
       </div>
     </div>
   </div>
 
   {{-- Recent Bookings --}}
   <div class="col-lg-8">
-    <div class="card-custom">
-      <div class="card-header-custom">
-        <h6><i class="fas fa-calendar-check me-2" style="color:var(--brand-blue);"></i>Recent Bookings</h6>
-        <a href="{{ route('customer.bookings') }}" style="color:var(--brand-blue);font-size:.82rem;font-weight:600;">View All</a>
+    <div class="card-custom" style="background:#FFFFFF;border:1px solid var(--color-border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm);">
+      <div class="card-header-custom" style="background:#FFFFFF;border-bottom:1px solid var(--color-border);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+        <h6 style="font-weight:700;margin:0;color:var(--color-text-dark);font-family:'Poppins',sans-serif;"><i class="fas fa-calendar-check me-2" style="color:var(--color-primary);"></i>Recent Bookings</h6>
+        <a href="{{ route('customer.bookings') }}" style="color:var(--color-primary);font-size:.82rem;font-weight:600;">View All</a>
       </div>
       <div class="card-body-custom p-0">
         @if($bookings->isEmpty())
-          <div class="empty-state"><i class="fas fa-calendar-times"></i><p>No bookings yet. <a href="{{ route('search') }}" style="color:var(--brand-blue);font-weight:600;">Book your first service!</a></p></div>
+          <div class="empty-state p-4 text-center"><i class="fas fa-calendar-times" style="font-size:2rem;color:var(--color-text-muted);margin-bottom:.5rem;"></i><p style="color:var(--color-text-muted);font-size:.88rem;">No bookings yet. <a href="{{ route('search') }}" style="color:var(--color-primary);font-weight:600;">Book your first service!</a></p></div>
         @else
-        <table class="table-custom w-100">
-          <thead><tr><th>Service</th><th>Provider</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
-          <tbody>
-            @foreach($bookings as $b)
-            <tr>
-              <td><div style="font-weight:600;font-size:.88rem;">{{ $b->category->name }}</div><div style="font-size:.75rem;color:var(--text-muted);">{{ $b->booking_code }}</div></td>
-              <td><div class="d-flex align-items-center gap-2"><div class="avatar-sm">{{ strtoupper(substr($b->provider->name,0,1)) }}</div><span style="font-size:.85rem;font-weight:500;">{{ $b->provider->name }}</span></div></td>
-              <td style="font-size:.85rem;">{{ $b->booking_date->format('d M Y') }}<br><span style="color:var(--text-muted);font-size:.75rem;">{{ $b->formatted_time }}</span></td>
-              <td style="font-weight:700;color:var(--brand-blue);">₹{{ number_format($b->total_amount) }}</td>
-              <td><span class="badge-pill badge-status-{{ $b->status }}">{{ ucfirst(str_replace('_',' ',$b->status)) }}</span></td>
-            </tr>
-            @endforeach
-          </tbody>
-        </table>
+        <div class="table-responsive" style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;">
+          <table class="table-custom w-100">
+            <thead><tr><th>Service</th><th>Provider</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              @foreach($bookings as $b)
+              <tr>
+                <td><div style="font-weight:600;font-size:.88rem;color:var(--color-text-dark);">{{ $b->category->name }}</div><div style="font-size:.75rem;color:var(--color-text-muted);">{{ $b->booking_code }}</div></td>
+                <td><div class="d-flex align-items-center gap-2"><div class="avatar-sm" style="width:32px;height:32px;border-radius:8px;background:var(--color-blue-tint);color:var(--color-primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;">{{ strtoupper(substr($b->provider->name,0,1)) }}</div><span style="font-size:.85rem;font-weight:500;color:var(--color-text-dark);">{{ $b->provider->name }}</span></div></td>
+                <td style="font-size:.85rem;color:var(--color-text-dark);">{{ $b->booking_date->format('d M Y') }}<br><span style="color:var(--color-text-muted);font-size:.75rem;">{{ $b->formatted_time }}</span></td>
+                <td style="font-weight:700;color:var(--color-primary);">₹{{ number_format($b->total_amount) }}</td>
+                <td><span class="badge-pill badge-status-{{ $b->status }}">{{ ucfirst(str_replace('_',' ',$b->status)) }}</span></td>
+              </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
         @endif
       </div>
     </div>
@@ -170,18 +184,18 @@
   {{-- Right Panel --}}
   <div class="col-lg-4 d-flex flex-column gap-4">
     {{-- Maintenance Reminders --}}
-    <div class="card-custom">
-      <div class="card-header-custom">
-        <h6><i class="fas fa-bell me-2" style="color:var(--gold);"></i>Reminders</h6>
-        <a href="{{ route('customer.reminders') }}" style="color:var(--brand-blue);font-size:.82rem;font-weight:600;">Manage</a>
+    <div class="card-custom" style="background:#FFFFFF;border:1px solid var(--color-border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm);">
+      <div class="card-header-custom" style="background:#FFFFFF;border-bottom:1px solid var(--color-border);padding:1.1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;">
+        <h6 style="font-weight:700;margin:0;color:var(--color-text-dark);font-family:'Poppins',sans-serif;"><i class="fas fa-bell me-2" style="color:#D97706;"></i>Reminders</h6>
+        <a href="{{ route('customer.reminders') }}" class="btn btn-sm" style="border-radius:20px;padding:.2rem .75rem;font-size:.78rem;font-weight:600;background:var(--color-bg);border:1px solid var(--color-border);color:var(--color-primary);">Manage</a>
       </div>
-      <div class="card-body-custom">
+      <div class="card-body-custom p-3">
         @forelse($reminders as $r)
-        <div style="display:flex;align-items:center;gap:.75rem;padding:.65rem 0;border-bottom:1px solid var(--card-border);" class="{{ !$loop->last ? '' : '' }}">
-          <div class="stat-icon" style="background:rgba(37,99,235,.08);width:36px;height:36px;border-radius:10px;"><i class="{{ $r->category->icon }}" style="color:var(--brand-blue);font-size:.9rem;"></i></div>
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.65rem 0;border-bottom:1px solid var(--color-border);" class="{{ !$loop->last ? '' : '' }}">
+          <div class="stat-icon" style="background:var(--color-blue-tint);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="{{ $r->category->icon }}" style="color:var(--color-primary);font-size:.9rem;"></i></div>
           <div class="flex-grow-1">
-            <div style="font-weight:600;font-size:.85rem;">{{ $r->title }}</div>
-            <div style="font-size:.75rem;color:{{ $r->next_due_date->diffInDays(now()) <= 7 ? 'var(--danger)' : 'var(--text-muted)' }};">
+            <div style="font-weight:600;font-size:.85rem;color:var(--color-text-dark);">{{ $r->title }}</div>
+            <div style="font-size:.75rem;color:{{ $r->next_due_date->diffInDays(now()) <= 7 ? 'var(--color-danger)' : 'var(--color-text-muted)' }};">
               Due: {{ $r->next_due_date->format('d M Y') }}
             </div>
           </div>
@@ -195,15 +209,15 @@
 
   {{-- Neighbour Trusted Providers (Location-Based) --}}
   <div class="col-12" id="neighbourhoodProvidersSection">
-    <div class="card-custom">
-      <div class="card-header-custom d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="card-custom" style="background:#FFFFFF;border:1px solid var(--color-border);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm);">
+      <div class="card-header-custom d-flex justify-content-between align-items-center flex-wrap gap-2" style="background:#FFFFFF;border-bottom:1px solid var(--color-border);padding:1.25rem 1.5rem;">
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <h6 class="mb-0">
-            <i class="fas fa-heart me-2" style="color:var(--pink);"></i>Neighbour Trusted Providers
+          <h6 class="mb-0" style="font-weight:700;color:var(--color-text-dark);font-family:'Poppins',sans-serif;">
+            <i class="fas fa-heart me-2" style="color:var(--color-primary);"></i>Neighbour Trusted Providers
           </h6>
           @if(!$customerLocation['is_missing'])
-          <span class="badge" style="background:rgba(37,99,235,.08);color:var(--brand-deep-blue);border:1px solid rgba(37,99,235,.2);border-radius:20px;padding:.3rem .75rem;font-size:.75rem;font-weight:600;">
-            <i class="fas fa-map-marker-alt me-1 text-primary"></i>Near {{ $customerLocation['label'] }}
+          <span class="badge" style="background:var(--color-blue-tint);color:var(--color-primary);border:1px solid rgba(36,81,189,.2);border-radius:999px;padding:.35rem .85rem;font-size:.75rem;font-weight:600;">
+            <i class="fas fa-map-marker-alt me-1" style="color:var(--color-primary);"></i>Near {{ $customerLocation['label'] }}
           </span>
           @endif
         </div>
@@ -211,8 +225,8 @@
         <div class="d-flex align-items-center gap-2 flex-wrap">
           {{-- Radius Selector --}}
           <div class="d-inline-flex align-items-center gap-1">
-            <span style="font-size:.75rem;color:var(--text-muted);font-weight:600;"><i class="fas fa-bullseye me-1"></i>Radius:</span>
-            <select class="form-select form-select-sm" style="width:auto;display:inline-block;padding:.2rem 1.6rem .2rem .6rem;font-size:.75rem;border-radius:20px;" onchange="changeRadius(this.value)">
+            <span style="font-size:.75rem;color:var(--color-text-muted);font-weight:600;"><i class="fas fa-bullseye me-1"></i>Radius:</span>
+            <select class="form-select form-select-sm" style="width:auto;display:inline-block;padding:.2rem 1.6rem .2rem .6rem;font-size:.75rem;border-radius:20px;border-color:var(--color-border);" onchange="changeRadius(this.value)">
               @foreach($radiusOptions as $r)
                 <option value="{{ $r }}" {{ (int)$currentRadius === (int)$r ? 'selected' : '' }}>{{ $r }} km</option>
               @endforeach
@@ -225,36 +239,36 @@
           </button>
 
           {{-- Edit Location Button --}}
-          <button type="button" class="btn btn-sm" style="border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:600;background:var(--bg-light);border:1px solid var(--card-border);color:var(--brand-deep-blue);" data-bs-toggle="collapse" data-bs-target="#editLocationCollapse" aria-expanded="false">
+          <button type="button" class="btn btn-sm" style="border-radius:20px;padding:.25rem .75rem;font-size:.75rem;font-weight:600;background:var(--color-bg);border:1px solid var(--color-border);color:var(--color-text-dark);" data-bs-toggle="collapse" data-bs-target="#editLocationCollapse" aria-expanded="false">
             <i class="fas fa-map-pin me-1"></i>Edit Location
           </button>
 
-          <a href="{{ route('search') }}?neighborhood_trusted=1" style="color:var(--brand-blue);font-size:.82rem;font-weight:600;">View All</a>
+          <a href="{{ route('search') }}?neighborhood_trusted=1" style="color:var(--color-primary);font-size:.82rem;font-weight:600;">View All</a>
         </div>
       </div>
 
       {{-- Collapsible Location Editor --}}
       <div class="collapse {{ $locationStatus === 'missing_location' ? 'show' : '' }}" id="editLocationCollapse">
-        <div style="background:var(--brand-cream);border-bottom:1px solid var(--card-border);padding:1.25rem 1.5rem;">
+        <div style="background:var(--color-bg);border-bottom:1px solid var(--color-border);padding:1.25rem 1.5rem;">
           <form method="POST" action="{{ route('customer.location.update') }}">
             @csrf
             <div class="row g-2 align-items-end">
-              <div class="col-md-3">
-                <label style="font-size:.75rem;font-weight:700;color:var(--brand-deep-blue);display:block;margin-bottom:.25rem;">Building / Society</label>
+              <div class="col-12 col-sm-6 col-md-3">
+                <label style="font-size:.75rem;font-weight:700;color:var(--color-text-dark);display:block;margin-bottom:.25rem;">Building / Society</label>
                 <input type="text" name="building" class="form-control form-control-sm" placeholder="e.g. Shivalik Heights" value="{{ old('building', $customerLocation['building']) }}">
               </div>
-              <div class="col-md-3">
-                <label style="font-size:.75rem;font-weight:700;color:var(--brand-deep-blue);display:block;margin-bottom:.25rem;">Locality / Neighbourhood</label>
+              <div class="col-12 col-sm-6 col-md-3">
+                <label style="font-size:.75rem;font-weight:700;color:var(--color-text-dark);display:block;margin-bottom:.25rem;">Locality / Neighbourhood</label>
                 <input type="text" name="locality" class="form-control form-control-sm" placeholder="e.g. SG Highway, Satellite, Bopal" value="{{ old('locality', $customerLocation['locality']) }}">
               </div>
-              <div class="col-md-3">
-                <label style="font-size:.75rem;font-weight:700;color:var(--brand-deep-blue);display:block;margin-bottom:.25rem;">City</label>
+              <div class="col-12 col-sm-6 col-md-3">
+                <label style="font-size:.75rem;font-weight:700;color:var(--color-text-dark);display:block;margin-bottom:.25rem;">City</label>
                 <select name="city" class="form-select form-select-sm">
                   <option value="Ahmedabad" {{ ($customerLocation['city'] ?? $userCity) === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
                   <option value="Gandhinagar" {{ ($customerLocation['city'] ?? $userCity) === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
                 </select>
               </div>
-              <div class="col-md-3 d-flex gap-2">
+              <div class="col-12 col-sm-6 col-md-3 d-flex gap-2">
                 <button type="submit" class="btn btn-sm btn-primary-custom flex-grow-1" style="padding:.35rem .75rem;font-size:.8rem;">
                   <i class="fas fa-check me-1"></i>Save Location
                 </button>
@@ -269,15 +283,15 @@
         </div>
       </div>
 
-      <div class="card-body-custom">
+      <div class="card-body-custom p-4">
         {{-- State 1: Missing Location Prompt --}}
         @if($locationStatus === 'missing_location')
-        <div class="p-4 text-center" style="background:#fff;border-radius:12px;">
-          <div style="width:56px;height:56px;border-radius:50%;background:rgba(37,99,235,.1);display:inline-flex;align-items:center;justify-content:center;color:var(--brand-blue);font-size:1.6rem;margin-bottom:.75rem;">
+        <div class="p-4 text-center" style="background:#fff;border-radius:14px;border:1px dashed var(--color-border);">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--color-blue-tint);display:inline-flex;align-items:center;justify-content:center;color:var(--color-primary);font-size:1.6rem;margin-bottom:.75rem;">
             <i class="fas fa-map-marker-alt"></i>
           </div>
-          <h6 style="font-weight:800;color:var(--brand-deep-blue);margin-bottom:.35rem;">Set Your Neighbourhood Location</h6>
-          <p style="color:var(--text-secondary);font-size:.85rem;max-width:500px;margin:0 auto 1rem;">
+          <h6 style="font-weight:700;color:var(--color-text-dark);margin-bottom:.35rem;font-family:'Poppins',sans-serif;">Set Your Neighbourhood Location</h6>
+          <p style="color:var(--color-text-muted);font-size:.85rem;max-width:500px;margin:0 auto 1rem;line-height:1.5;">
             Please enter your address, building, or allow browser location permission above so we can display verified service providers located right near you.
           </p>
           <div class="d-flex justify-content-center gap-2">
@@ -292,12 +306,12 @@
 
         {{-- State 2: No Matches Found --}}
         @elseif($locationStatus === 'no_matches' || $recommendedProviders->isEmpty())
-        <div class="p-4 text-center" style="background:#fff;border-radius:12px;">
-          <div style="width:56px;height:56px;border-radius:50%;background:rgba(232,165,26,.15);display:inline-flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.6rem;margin-bottom:.75rem;">
+        <div class="p-4 text-center" style="background:#fff;border-radius:14px;border:1px dashed var(--color-border);">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(217,119,6,.12);display:inline-flex;align-items:center;justify-content:center;color:#D97706;font-size:1.6rem;margin-bottom:.75rem;">
             <i class="fas fa-search-location"></i>
           </div>
-          <h6 style="font-weight:800;color:var(--brand-deep-blue);margin-bottom:.35rem;">No trusted providers found near your location yet.</h6>
-          <p style="color:var(--text-secondary);font-size:.85rem;max-width:520px;margin:0 auto 1.25rem;">
+          <h6 style="font-weight:700;color:var(--color-text-dark);margin-bottom:.35rem;font-family:'Poppins',sans-serif;">No trusted providers found near your location yet.</h6>
+          <p style="color:var(--color-text-muted);font-size:.85rem;max-width:520px;margin:0 auto 1.25rem;line-height:1.5;">
             We couldn't find verified professionals within <strong>{{ $currentRadius }} km</strong> of <strong>{{ $customerLocation['label'] }}</strong>. Try expanding your search radius or verifying your locality name.
           </p>
           <div class="d-flex justify-content-center gap-2 flex-wrap">
@@ -318,46 +332,46 @@
         <div class="row g-3">
           @foreach($recommendedProviders as $p)
           <div class="col-md-6 col-xl-3">
-            <div class="h-100 d-flex flex-column justify-content-between" style="border:{{ $p->isNeighborhoodTrusted() ? '1.5px solid rgba(236,72,153,.35)' : '1px solid var(--card-border)' }};border-radius:14px;padding:1.2rem;text-align:center;transition:.2s;background:#fff;" onmouseover="this.style.boxShadow='var(--shadow)'" onmouseout="this.style.boxShadow='none'">
+            <div class="h-100 d-flex flex-column justify-content-between" style="border:{{ $p->isNeighborhoodTrusted() ? '1.5px solid rgba(36,81,189,.3)' : '1px solid var(--color-border)' }};border-radius:16px;padding:1.25rem;text-align:center;transition:.2s;background:#fff;box-shadow:var(--shadow-sm);" onmouseover="this.style.boxShadow='var(--shadow)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
               <div>
                 {{-- Badges Header --}}
                 <div class="d-flex justify-content-between align-items-center gap-1 mb-2 flex-wrap">
                   @if($p->isNeighborhoodTrusted())
-                  <span style="background:rgba(236,72,153,.1);color:var(--pink);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:800;">
+                  <span style="background:var(--color-primary);color:#fff;border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;">
                     <i class="fas fa-heart me-1"></i>Neighbour Choice
                   </span>
                   @endif
 
                   {{-- Match Badge (e.g. Same Building, Serves your area) --}}
                   @if($p->match_type === 'same_building' || (!empty($p->match_badge) && $p->match_badge !== $p->distance_text))
-                  <span style="background:rgba(16,185,129,.1);color:var(--success);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;">
+                  <span style="background:rgba(30,122,79,.1);color:var(--color-success);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;">
                     <i class="fas {{ $p->match_type === 'same_building' ? 'fa-building' : 'fa-check-circle' }} me-1"></i>{{ $p->match_badge }}
                   </span>
                   @endif
 
                   {{-- Distance / Proximity Match Badge --}}
                   @if(!empty($p->distance_text))
-                  <span style="background:rgba(37,99,235,.1);color:var(--brand-blue);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;" title="Calculated distance">
+                  <span style="background:var(--color-blue-tint);color:var(--color-primary);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:700;" title="Calculated distance">
                     <i class="fas fa-location-arrow me-1"></i>{{ $p->distance_text }}
                   </span>
                   @endif
                 </div>
 
-                <div class="avatar-md mx-auto mb-2">{{ strtoupper(substr($p->name,0,1)) }}</div>
-                <div style="font-weight:700;font-size:.9rem;color:var(--brand-deep-blue);">{{ $p->name }}</div>
-                <div style="font-size:.78rem;color:var(--text-secondary);">{{ $p->category->name }}</div>
-                <div style="font-size:.75rem;color:var(--text-muted);margin-top:.25rem;">
-                  <i class="fas fa-map-marker-alt me-1" style="color:var(--brand-blue);"></i>{{ $p->service_area }}
+                <div class="avatar-md mx-auto mb-2" style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg, var(--color-primary), var(--color-support-blue));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;">{{ strtoupper(substr($p->name,0,1)) }}</div>
+                <div style="font-weight:700;font-size:.9rem;color:var(--color-text-dark);font-family:'Poppins',sans-serif;">{{ $p->name }}</div>
+                <div style="font-size:.78rem;color:var(--color-text-muted);">{{ $p->category->name }}</div>
+                <div style="font-size:.75rem;color:var(--color-text-muted);margin-top:.25rem;">
+                  <i class="fas fa-map-marker-alt me-1" style="color:var(--color-primary);"></i>{{ $p->service_area }}
                 </div>
                 <div class="d-flex justify-content-center align-items-center gap-1 my-2">
-                  <i class="fas fa-star" style="font-size:.75rem;color:var(--gold);"></i>
-                  <span style="font-weight:700;font-size:.8rem;">{{ $p->average_rating }}</span>
-                  <span style="font-size:.72rem;color:var(--text-muted);">({{ $p->completed_jobs }} jobs)</span>
+                  <i class="fas fa-star" style="font-size:.75rem;color:#D97706;"></i>
+                  <span style="font-weight:700;font-size:.8rem;color:var(--color-text-dark);">{{ $p->average_rating }}</span>
+                  <span style="font-size:.72rem;color:var(--color-text-muted);">({{ $p->completed_jobs }} jobs)</span>
                 </div>
               </div>
 
               <div>
-                <div style="font-weight:800;color:var(--brand-blue);font-size:.88rem;margin-bottom:.5rem;">₹{{ number_format($p->hourly_rate) }}/hr</div>
+                <div style="font-weight:800;color:var(--color-primary);font-size:.9rem;margin-bottom:.5rem;font-family:'Poppins',sans-serif;">₹{{ number_format($p->hourly_rate) }}/hr</div>
                 <a href="{{ route('provider.show',$p) }}" class="btn-primary-custom btn btn-sm w-100" style="justify-content:center;padding:.4rem;">View &amp; Book</a>
               </div>
             </div>
@@ -372,6 +386,79 @@
 @endsection
 @push('scripts')
 <script>
+function getTimeBasedGreeting(date = new Date()) {
+  const hour = date.getHours();
+
+  if (hour >= 5 && hour < 12) {
+    return "Good morning";
+  }
+
+  if (hour >= 12 && hour < 17) {
+    return "Good afternoon";
+  }
+
+  if (hour >= 17 && hour < 21) {
+    return "Good evening";
+  }
+
+  return "Good night";
+}
+
+function getGreetingEmoji(greeting) {
+  switch (greeting) {
+    case 'Good morning':
+      return '☀️';
+    case 'Good afternoon':
+      return '🌤️';
+    case 'Good evening':
+      return '🌆';
+    case 'Good night':
+      return '🌙';
+    default:
+      return '☀️';
+  }
+}
+
+function updateGreeting() {
+  const textEl = document.getElementById('greetingText');
+  const emojiEl = document.getElementById('greetingEmoji');
+  if (!textEl) return;
+
+  const greeting = getTimeBasedGreeting();
+  if (textEl.textContent !== greeting) {
+    textEl.textContent = greeting;
+  }
+  if (emojiEl) {
+    const emoji = getGreetingEmoji(greeting);
+    if (emojiEl.textContent !== emoji) {
+      emojiEl.textContent = emoji;
+    }
+  }
+}
+
+// Update greeting immediately when script executes
+updateGreeting();
+
+// Ensure greeting is updated when DOM is ready if script ran early
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', updateGreeting);
+}
+
+// Automatically refresh greeting when tab regains visibility
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) {
+    updateGreeting();
+  }
+});
+
+// Update automatically if current time crosses a greeting boundary while dashboard remains open
+setInterval(updateGreeting, 60000);
+
+// Expose on window for testing and programmatic checks
+window.getTimeBasedGreeting = getTimeBasedGreeting;
+window.getGreetingEmoji = getGreetingEmoji;
+window.updateGreeting = updateGreeting;
+
 function detectLocation(btn) {
   if (!navigator.geolocation) {
     alert('Geolocation is not supported by your browser.');

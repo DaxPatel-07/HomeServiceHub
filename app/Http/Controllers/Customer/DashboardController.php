@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Provider;
 use App\Models\MaintenanceReminder;
 use App\Services\NeighbourhoodProviderService;
 use Illuminate\Http\Request;

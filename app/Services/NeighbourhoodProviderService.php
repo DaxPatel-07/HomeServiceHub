@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Provider;
 use App\Models\User;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class NeighbourhoodProviderService
 {

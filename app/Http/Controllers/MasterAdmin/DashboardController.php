@@ -21,7 +21,10 @@ class DashboardController extends Controller {
             'open_complaints' => Complaint::where('status','open')->count(),
             'avg_rating' => round(Review::avg('rating'), 2),
         ];
-        $monthlyBookings = Booking::selectRaw('MONTH(created_at) as month, COUNT(*) as total, SUM(total_amount) as revenue')
+        $monthExpr = config('database.default') === 'sqlite'
+            ? "cast(strftime('%m', created_at) as integer)"
+            : 'MONTH(created_at)';
+        $monthlyBookings = Booking::selectRaw("{$monthExpr} as month, COUNT(*) as total, SUM(total_amount) as revenue")
             ->whereYear('created_at', date('Y'))
             ->groupBy('month')->orderBy('month')->get();
         $recentUsers = User::latest()->take(5)->get();

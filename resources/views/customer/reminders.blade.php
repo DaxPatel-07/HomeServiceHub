@@ -13,14 +13,6 @@
 <div class="nav-item"><a href="javascript:void(0)" onclick="toggleFloatingChat()"><i class="fas fa-robot"></i>AI Assistant</a></div>
 <div class="nav-section-title">Account</div>
 <div class="nav-item"><a href="{{ route('customer.profile') }}"><i class="fas fa-user-circle"></i>My Profile</a></div>
-<div class="nav-item">
-  <form method="POST" action="{{ route('logout') }}" id="sidebarCustomerNavLogoutForm" style="display:none;">
-    @csrf
-  </form>
-  <a href="javascript:void(0)" onclick="document.getElementById('sidebarCustomerNavLogoutForm').submit();" style="color:#EF4444;font-weight:600;">
-    <i class="fas fa-sign-out-alt" style="color:#EF4444;"></i>Logout
-  </a>
-</div>
 @endsection
 @section('content')
 <div class="row g-4">
@@ -31,7 +23,7 @@
       </div>
       <div class="card-body-custom">
         @forelse($reminders as $r)
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;background:var(--bg-light);border-radius:12px;margin-bottom:.75rem;border:1px solid var(--card-border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;padding:1rem;background:var(--bg-light);border-radius:12px;margin-bottom:.75rem;border:1px solid var(--card-border);">
           <div class="d-flex align-items-center gap-3">
             <div class="stat-icon" style="background:rgba(37,99,235,.08);width:44px;height:44px;border-radius:12px;"><i class="{{ $r->category->icon }}" style="color:var(--brand-blue);font-size:1.2rem;"></i></div>
             <div>
