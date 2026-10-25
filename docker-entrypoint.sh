@@ -16,8 +16,18 @@ mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/bootstrap/cache
 touch /var/www/html/storage/logs/laravel.log
 
+# Detect and export DATABASE_URL if provided (e.g. Render, Railway, Supabase)
+if [ -n "$DATABASE_URL" ] && [ -z "$DB_URL" ]; then
+    export DB_URL="$DATABASE_URL"
+    if [[ "$DATABASE_URL" =~ ^postgres ]] && [ -z "$DB_CONNECTION" ]; then
+        export DB_CONNECTION="pgsql"
+    elif [[ "$DATABASE_URL" =~ ^mysql ]] && [ -z "$DB_CONNECTION" ]; then
+        export DB_CONNECTION="mysql"
+    fi
+fi
+
 # If SQLite is selected and database file doesn't exist, initialize it
-if [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_CONNECTION" ]; then
+if [ "$DB_CONNECTION" = "sqlite" ] || ([ -z "$DB_CONNECTION" ] && [ -z "$DB_HOST" ] && [ -z "$DB_URL" ] && [ -z "$DATABASE_URL" ]); then
     mkdir -p /var/www/html/database
     if [ ! -f /var/www/html/database/database.sqlite ]; then
         touch /var/www/html/database/database.sqlite
@@ -31,7 +41,7 @@ php artisan storage:link --force || true
 php artisan package:discover --ansi || true
 
 # Run database migrations and seeding if DB is provided
-if [ -n "$DB_HOST" ] || [ -n "$DB_URL" ] || [ "$DB_CONNECTION" = "sqlite" ]; then
+if [ -n "$DB_HOST" ] || [ -n "$DB_URL" ] || [ -n "$DATABASE_URL" ] || [ "$DB_CONNECTION" = "sqlite" ]; then
     echo "Running database migrations..."
     php artisan migrate --force || echo "Migration skipped or failed (check DB connection)."
     echo "Seeding initial database records..."

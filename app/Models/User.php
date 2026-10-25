@@ -17,6 +17,9 @@ class User extends Authenticatable {
     protected $casts = ['email_verified_at' => 'datetime', 'password' => 'hashed', 'is_active' => 'boolean', 'latitude' => 'float', 'longitude' => 'float'];
 
     public function provider() { return $this->hasOne(Provider::class); }
+    public function setEmailAttribute($value) {
+        $this->attributes['email'] = strtolower(trim((string) $value));
+    }
     public function bookings() { return $this->hasMany(Booking::class, 'customer_id'); }
     public function reviews() { return $this->hasMany(Review::class, 'customer_id'); }
     public function reminders() { return $this->hasMany(MaintenanceReminder::class, 'customer_id'); }

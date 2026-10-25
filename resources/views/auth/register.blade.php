@@ -758,6 +758,9 @@
               value="{{ old('email') }}"
               required
               autocomplete="email"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
             >
           </div>
           @error('email')

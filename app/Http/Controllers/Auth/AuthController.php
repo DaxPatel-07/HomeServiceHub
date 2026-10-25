@@ -39,8 +39,14 @@ class AuthController extends Controller {
     }
 
     public function login(Request $request) {
+        if ($request->has('email')) {
+            $request->merge(['email' => strtolower(trim((string) $request->email))]);
+        }
         $request->validate(['email' => 'required|email', 'password' => 'required']);
-        $credentials = $request->only('email', 'password');
+        $credentials = [
+            'email'    => strtolower(trim((string) $request->email)),
+            'password' => $request->password,
+        ];
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $user = Auth::user();
 
@@ -93,6 +99,9 @@ class AuthController extends Controller {
     }
 
     public function register(Request $request) {
+        if ($request->has('email')) {
+            $request->merge(['email' => strtolower(trim((string) $request->email))]);
+        }
         $rules = [
             'name'     => 'required|string|max:100',
             'email'    => 'required|email|max:255|unique:users',
