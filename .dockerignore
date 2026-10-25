@@ -1,0 +1,15 @@
+.git
+.github
+node_modules
+npm-debug.log
+vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+.phpunit.cache
+.idea
+.vscode
+tests
+README.md
+storage/logs/*.log
