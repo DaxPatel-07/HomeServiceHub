@@ -79,6 +79,9 @@ class ExactLoginRegisterUITest extends TestCase
         $response->assertSee('Full Name');
         $response->assertSee('Phone Number');
         $response->assertSee('Email Address');
+        $response->assertSee('Address');
+        $response->assertSee('Enter your full address');
+        $response->assertSee('name="address"', false);
         $response->assertSee('Password');
         $response->assertSee('Confirm Password');
         $response->assertSee('name="password_confirmation"', false);
@@ -109,6 +112,7 @@ class ExactLoginRegisterUITest extends TestCase
             'password_confirmation' => 'Password123!',
             'role' => 'customer',
             'city' => 'Ahmedabad',
+            'address' => 'Flat 402, Shivalik Heights, Judges Bungalow Road, Bodakdev',
             'terms' => '1',
         ]);
 
@@ -119,6 +123,7 @@ class ExactLoginRegisterUITest extends TestCase
             'email' => 'aarav.patel@example.com',
             'role' => 'customer',
             'name' => 'Aarav Patel',
+            'address' => 'Flat 402, Shivalik Heights, Judges Bungalow Road, Bodakdev',
         ]);
     }
 
@@ -135,6 +140,7 @@ class ExactLoginRegisterUITest extends TestCase
             'password_confirmation' => 'Password123!',
             'role' => 'provider',
             'city' => 'Ahmedabad',
+            'address' => 'Shop 12, Sunrise Complex, Near Vastrapur Lake',
             'category_id' => $category->id,
             'hourly_rate' => 450,
             'terms' => '1',
@@ -146,11 +152,30 @@ class ExactLoginRegisterUITest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'meera.electric@example.com',
             'role' => 'provider',
+            'address' => 'Shop 12, Sunrise Complex, Near Vastrapur Lake',
         ]);
 
         $this->assertDatabaseHas('providers', [
             'category_id' => $category->id,
             'hourly_rate' => 450,
         ]);
+    }
+
+    public function test_registration_password_fields_layout_and_elements_integrity(): void
+    {
+        $response = $this->get(route('register'));
+        $response->assertStatus(200);
+
+        // Check password visibility toggles and attributes
+        $response->assertSee('id="regPassword"', false);
+        $response->assertSee('id="regPasswordConfirm"', false);
+        $response->assertSee('id="pwdEye1"', false);
+        $response->assertSee('id="pwdEye2"', false);
+        $response->assertSee('togglePasswordVisibility', false);
+
+        // Confirm CSS Grid minmax and layout classes prevent overflow
+        $response->assertSee('repeat(2, minmax(0, 1fr))', false);
+        $response->assertSee('reg-textarea-wrap', false);
+        $response->assertSee('Enter your full address', false);
     }
 }

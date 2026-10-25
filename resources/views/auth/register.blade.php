@@ -261,20 +261,36 @@
   }
 
   /* Form Layout */
+  #registerForm {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
   .form-row-two-col {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
     margin-bottom: 14px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .form-row-full {
+    width: 100%;
+    max-width: 100%;
     margin-bottom: 14px;
+    box-sizing: border-box;
   }
 
   .reg-field-group {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   .reg-field-label {
@@ -298,6 +314,11 @@
     border-radius: 10px;
     padding: 0 13px;
     gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
@@ -309,23 +330,29 @@
   .reg-input-icon {
     color: #94A3B8;
     font-size: 0.92rem;
+    width: 16px;
+    height: 16px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
     pointer-events: none;
   }
 
   .reg-input-wrap input,
-  .reg-input-wrap select,
-  .reg-textarea-wrap textarea {
-    flex: 1;
+  .reg-input-wrap select {
+    flex: 1 1 0%;
+    width: 100%;
+    min-width: 0;
     border: none;
     outline: none;
     background: transparent;
     font-size: 0.92rem;
     color: var(--reg-text-dark);
     font-family: inherit;
-    min-width: 0;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
   }
 
   .reg-input-wrap input::placeholder,
@@ -335,10 +362,16 @@
 
   .reg-textarea-wrap {
     display: flex;
+    align-items: flex-start;
+    gap: 10px;
     background: #FFFFFF;
     border: 1.5px solid var(--reg-border);
     border-radius: 10px;
     padding: 10px 13px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
@@ -347,20 +380,47 @@
     box-shadow: 0 0 0 3px rgba(36, 81, 189, 0.12);
   }
 
+  .reg-textarea-wrap textarea {
+    flex: 1 1 0%;
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.92rem;
+    color: var(--reg-text-dark);
+    font-family: inherit;
+    resize: vertical;
+    min-height: 54px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
   .reg-toggle-pwd {
     background: transparent;
     border: none;
     padding: 0;
+    margin: 0;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
     color: #94A3B8;
     cursor: pointer;
     font-size: 0.92rem;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     transition: color 0.15s ease;
   }
 
   .reg-toggle-pwd:hover {
     color: var(--reg-text-dark);
+  }
+
+  .reg-toggle-pwd:focus-visible {
+    outline: 2px solid var(--reg-primary);
+    border-radius: 4px;
   }
 
   .field-error-hint {
@@ -496,7 +556,7 @@
   }
 
   /* Responsive Adjustments */
-  @media (max-width: 600px) {
+  @media (max-width: 640px) {
     .register-page-wrapper {
       padding: 24px 14px;
     }
@@ -512,7 +572,7 @@
 
     .form-row-two-col {
       grid-template-columns: 1fr;
-      gap: 12px;
+      gap: 14px;
     }
 
     .role-selector-grid {
@@ -522,6 +582,20 @@
 
     .reg-footer-nav {
       gap: 12px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .register-card {
+      padding: 20px 14px 18px;
+    }
+
+    .register-title {
+      font-size: 1.22rem;
+    }
+
+    .role-card {
+      padding: 10px 12px;
     }
   }
 </style>
@@ -710,6 +784,25 @@
       <!-- Hidden City fallback when Customer mode is active -->
       <input type="hidden" name="city" id="hiddenCustomerCity" value="{{ old('city', 'Ahmedabad') }}" {{ $activeRole === 'provider' ? 'disabled' : '' }}>
 
+      <!-- Row: Full Address -->
+      <div class="form-row-full">
+        <div class="reg-field-group">
+          <label for="regAddress" class="reg-field-label">Address</label>
+          <div class="reg-textarea-wrap">
+            <span class="reg-input-icon" style="align-self: flex-start; margin-top: 3px;"><i class="fas fa-map-marker-alt"></i></span>
+            <textarea
+              id="regAddress"
+              name="address"
+              rows="2"
+              placeholder="Enter your full address"
+            >{{ old('address') }}</textarea>
+          </div>
+          @error('address')
+            <span class="field-error-hint">{{ $message }}</span>
+          @enderror
+        </div>
+      </div>
+
       <!-- Row 3: Password & Confirm Password -->
       <div class="form-row-two-col">
         <div class="reg-field-group">
@@ -759,6 +852,9 @@
               <i class="far fa-eye" id="pwdEye2"></i>
             </button>
           </div>
+          @error('password_confirmation')
+            <span class="field-error-hint">{{ $message }}</span>
+          @enderror
         </div>
       </div>
 
