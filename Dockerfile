@@ -35,10 +35,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-        pdo \
         pdo_mysql \
         pdo_pgsql \
-        pdo_sqlite \
         mbstring \
         exif \
         pcntl \
@@ -69,8 +67,8 @@ COPY . .
 # Copy built frontend assets from Stage 1
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
-# Finish composer autoload optimization
-RUN composer dump-autoload --optimize --no-dev
+# Finish composer autoload optimization without running scripts during image build
+RUN composer dump-autoload --optimize --no-dev --no-scripts
 
 # Copy entrypoint script and normalize line endings for Linux
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

@@ -9,7 +9,9 @@ sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
 sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:$PORT>/g" /etc/apache2/sites-available/000-default.conf
 
 # Ensure required storage and cache directories exist with proper permissions
-mkdir -p /var/www/html/storage/framework/{cache,sessions,views}
+mkdir -p /var/www/html/storage/framework/cache
+mkdir -p /var/www/html/storage/framework/sessions
+mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/bootstrap/cache
 
@@ -29,7 +31,10 @@ fi
 # Ensure storage link exists
 php artisan storage:link --force || true
 
-# Run migrations automatically if DB is provided
+# Run package discovery now that runtime environment is available
+php artisan package:discover --ansi || true
+
+# Run database migrations if DB is provided
 if [ -n "$DB_HOST" ] || [ -n "$DB_URL" ] || [ "$DB_CONNECTION" = "sqlite" ]; then
     echo "Running database migrations..."
     php artisan migrate --force || echo "Migration skipped or failed (check DB connection)."
