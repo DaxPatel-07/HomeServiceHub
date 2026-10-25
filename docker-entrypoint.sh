@@ -46,6 +46,8 @@ if [ -n "$DB_HOST" ] || [ -n "$DB_URL" ] || [ -n "$DATABASE_URL" ] || [ "$DB_CON
     php artisan migrate --force || echo "Migration skipped or failed (check DB connection)."
     echo "Seeding initial database records..."
     php artisan db:seed --force || echo "Seeding skipped or already done."
+    # Remove demo customer if previously created
+    php artisan tinker --execute="App\Models\User::where('email', 'customer@hsh.com')->delete();" 2>/dev/null || true
 fi
 
 # Cache configuration, routes, and views for production performance

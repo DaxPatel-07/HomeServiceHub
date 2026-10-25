@@ -10,8 +10,6 @@ class UserSeeder extends Seeder {
         User::updateOrCreate(['email'=>'masteradmin@hsh.com'],['name'=>'Master Admin','password'=>Hash::make('password'),'role'=>'master_admin','phone'=>'9000000001','city'=>'Ahmedabad','is_active'=>true]);
         // Admin
         User::updateOrCreate(['email'=>'admin@hsh.com'],['name'=>'Admin User','password'=>Hash::make('password'),'role'=>'admin','phone'=>'9000000002','city'=>'Gandhinagar','is_active'=>true]);
-        // Demo Customer
-        User::updateOrCreate(['email'=>'customer@hsh.com'],['name'=>'Demo Customer','password'=>Hash::make('password'),'role'=>'customer','phone'=>'9000000003','city'=>'Ahmedabad','is_active'=>true]);
         // Providers (users)
         $providers = [
             ['name'=>'Cool Experts','email'=>'cool@provider.com','city'=>'Ahmedabad','phone'=>'9600000001'],
