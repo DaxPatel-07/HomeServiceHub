@@ -17,7 +17,8 @@ FROM php:8.2-apache
 
 # Set environment variables
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
-    APACHE_DOCUMENT_ROOT=/var/www/html/public
+    APACHE_DOCUMENT_ROOT=/var/www/html/public \
+    LOG_CHANNEL=stderr
 
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y --no-install-recommends \

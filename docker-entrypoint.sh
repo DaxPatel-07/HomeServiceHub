@@ -8,15 +8,13 @@ echo "Configuring Apache to listen on port: $PORT"
 sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
 sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:$PORT>/g" /etc/apache2/sites-available/000-default.conf
 
-# Ensure required storage and cache directories exist with proper permissions
+# Ensure required storage and cache directories exist
 mkdir -p /var/www/html/storage/framework/cache
 mkdir -p /var/www/html/storage/framework/sessions
 mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/bootstrap/cache
-
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+touch /var/www/html/storage/logs/laravel.log
 
 # If SQLite is selected and database file doesn't exist, initialize it
 if [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_CONNECTION" ]; then
@@ -24,8 +22,6 @@ if [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_CONNECTION" ]; then
     if [ ! -f /var/www/html/database/database.sqlite ]; then
         touch /var/www/html/database/database.sqlite
     fi
-    chown -R www-data:www-data /var/www/html/database
-    chmod -R 775 /var/www/html/database
 fi
 
 # Ensure storage link exists
@@ -45,6 +41,12 @@ echo "Caching Laravel configuration and routes..."
 php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
+
+# CRITICAL: Fix all permissions AFTER artisan commands run as root
+# This ensures Apache (www-data) can read/write logs, sessions, views, and database
+touch /var/www/html/storage/logs/laravel.log
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database 2>/dev/null || true
+chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database 2>/dev/null || true
 
 echo "Starting Apache on port $PORT..."
 exec "$@"
