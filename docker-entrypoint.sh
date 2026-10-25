@@ -30,10 +30,12 @@ php artisan storage:link --force || true
 # Run package discovery now that runtime environment is available
 php artisan package:discover --ansi || true
 
-# Run database migrations if DB is provided
+# Run database migrations and seeding if DB is provided
 if [ -n "$DB_HOST" ] || [ -n "$DB_URL" ] || [ "$DB_CONNECTION" = "sqlite" ]; then
     echo "Running database migrations..."
     php artisan migrate --force || echo "Migration skipped or failed (check DB connection)."
+    echo "Seeding initial database records..."
+    php artisan db:seed --force || echo "Seeding skipped or already done."
 fi
 
 # Cache configuration, routes, and views for production performance
