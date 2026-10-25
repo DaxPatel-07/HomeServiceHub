@@ -37,7 +37,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/become-a-provider', [AuthController::class, 'showBecomeProvider'])->name('become-provider');
     Route::post('/become-a-provider', [AuthController::class, 'register'])->middleware('throttle:register')->name('become-provider.post');
 });
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
 // AI Assistant
 Route::get('/ai-assistant', [ChatController::class, 'index'])->name('ai.assistant');
