@@ -15,7 +15,7 @@ class Provider extends Model {
     public function badges() { return $this->belongsToMany(Badge::class, 'provider_badges')->withPivot('earned_at')->withTimestamps(); }
     public function splitItems() { return $this->hasMany(SplitBookingItem::class, 'provider_id'); }
 
-    public function getNameAttribute() { return $this->business_name ?: $this->user->name; }
+    public function getNameAttribute() { return $this->business_name ?: ($this->user?->name ?? 'Service Provider'); }
     public function getCompletionRateAttribute() {
         if ($this->total_jobs == 0) return 0;
         return round(($this->completed_jobs / $this->total_jobs) * 100, 1);

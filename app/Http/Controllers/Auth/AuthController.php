@@ -6,6 +6,7 @@ use App\Models\Provider;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller {
@@ -111,20 +112,21 @@ class AuthController extends Controller {
         }
         $request->validate($rules);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'phone' => $request->phone,
-            'city' => $request->city,
-            'address' => $request->address,
-        ]);
+        $user = DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name'      => $request->name,
+                'email'     => $request->email,
+                'password'  => Hash::make($request->password),
+                'role'      => $request->role,
+                'phone'     => $request->phone,
+                'city'      => $request->city,
+                'address'   => $request->address,
+                'is_active' => true,
+            ]);
 
-        if ($request->role === 'provider') {
-            Provider::firstOrCreate(
-                ['user_id' => $user->id],
-                [
+            if ($request->role === 'provider') {
+                Provider::create([
+                    'user_id'             => $user->id,
                     'category_id'         => $request->category_id,
                     'business_name'       => $request->business_name ?: $user->name,
                     'bio'                 => $request->bio,
@@ -133,9 +135,12 @@ class AuthController extends Controller {
                     'hourly_rate'         => $request->hourly_rate ?? 0,
                     'verification_status' => 'pending',
                     'is_active'           => true,
-                ]
-            );
-        }
+                    'is_available'        => true,
+                ]);
+            }
+
+            return $user;
+        });
 
         Auth::login($user);
         
